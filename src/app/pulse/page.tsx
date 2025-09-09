@@ -1,12 +1,9 @@
 import React from 'react';
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabaseClient';
+import { AdsPulse } from '@/lib/types';
 
 export default async function Pulse() {
-  const { data, error } = await supabase
-    .from('sales.v_ads_pulse')
-    .select('*')
-    .gte('report_date', new Date(Date.now()-14*864e5).toISOString().slice(0,10))
-    .order('report_date', { ascending: true })
+  const { data, error } = await supabase.rpc('get_ads_pulse')
 
   if (error) return <pre>{error.message}</pre>
 
@@ -18,7 +15,7 @@ export default async function Pulse() {
           {data?.[0] && Object.keys(data[0]).map(k => <th key={k}>{k}</th>)}
         </tr></thead>
         <tbody>
-          {data?.map((row,i) => (
+          {(data as AdsPulse[])?.map((row: AdsPulse, i: number) => (
             <tr key={i}>
               {Object.values(row).map((v, j) => <td key={j}>{String(v ?? '')}</td>)}
             </tr>

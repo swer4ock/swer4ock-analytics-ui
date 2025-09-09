@@ -2,10 +2,7 @@ import React from 'react';
 import { supabase } from '@/lib/supabaseClient'
 
 export default async function Page() {
-  const { data, error } = await supabase
-    .from('analytics.v_ready_assets')
-    .select('name,fq_name,tags,last_refreshed')
-    .limit(1)
+  const { data, error } = await supabase.rpc('get_ready_assets', {}, { count: 'exact', head: true }); // Just check if the function is callable
 
   return (
     <main style={{padding:20}}>

@@ -1,12 +1,9 @@
 import React from 'react';
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabaseClient';
+import { ReadyAsset } from '@/lib/types';
 
 export default async function Assets() {
-  const { data, error } = await supabase
-    .from('analytics.v_ready_assets')
-    .select('name,fq_name,description,tags,last_refreshed')
-    .order('last_refreshed', { ascending: false })
-    .limit(100)
+  const { data, error } = await supabase.rpc('get_ready_assets')
 
   if (error) return <pre>{error.message}</pre>
 
@@ -18,7 +15,7 @@ export default async function Assets() {
           <tr><th>Name</th><th>FQ name</th><th>Tags</th><th>Refreshed</th></tr>
         </thead>
         <tbody>
-          {data?.map((r, i) => (
+          {(data as ReadyAsset[])?.map((r: ReadyAsset, i: number) => (
             <tr key={i}>
               <td>{r.name}</td>
               <td>{r.fq_name}</td>
