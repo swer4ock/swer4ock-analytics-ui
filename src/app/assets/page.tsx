@@ -10,10 +10,7 @@ type Asset = {
 };
 
 async function getAssets() {
-  const { data, error } = await supabase
-    .from('v_ready_assets')
-    .select('*')
-    .order('last_refreshed', { ascending: false, nullsFirst: false });
+  const { data, error } = await supabase.rpc('get_data_assets_direct');
 
   if (error) {
     console.error('Error fetching assets:', error);
