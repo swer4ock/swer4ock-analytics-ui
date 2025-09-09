@@ -1,86 +1,84 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-
-type Asset = {
-  name: string;
-  fq_name: string | null;
-  description: string | null;
-  tags: string[] | null;
-  last_refreshed: string | null;
-};
 
 export default function AssetsPage() {
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    async function fetchAssets() {
+    async function fetchData() {
       try {
-        setLoading(true);
-        setError(null);
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
         
-        // Try the hello_world RPC function first
-        const { data, error: rpcError } = await supabase.rpc('hello_world');
-        
-        if (rpcError) {
-          throw new Error(`RPC Error: ${rpcError.message}`);
+        if (!url || !key) {
+          throw new Error('Missing environment variables');
         }
-        
-        setAssets(data || []);
+
+        const response = await fetch(`${url}/rest/v1/rpc/hello_world`, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        setData(result);
       } catch (err: any) {
-        console.error('Error fetching assets:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchAssets();
+    fetchData();
   }, []);
 
   return (
     <main style={{ padding: 24, fontFamily: 'ui-sans-serif, system-ui' }}>
       <h1>Готовые датасеты</h1>
       
-      {loading && <p>Загрузка данных...</p>}
+      {loading && <p>Загрузка...</p>}
       
       {error && (
-        <div style={{ color: 'red', border: '1px solid red', padding: '1rem', margin: '1rem 0' }}>
-          <h3>Ошибка:</h3>
-          <pre>{error}</pre>
+        <div style={{ color: 'red', border: '1px solid red', padding: '1rem' }}>
+          <strong>Ошибка:</strong> {error}
         </div>
       )}
       
-      {!loading && !error && assets.length === 0 && (
-        <p>Данных пока нет.</p>
-      )}
-      
-      {!loading && !error && assets.length > 0 && (
+      {!loading && !error && (
         <div>
-          <p>Найдено записей: {assets.length}</p>
-          <table style={{ borderCollapse: 'collapse', width: '100%', marginTop: '1rem' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f5f5f5' }}>
-                <th style={{ textAlign: 'left', padding: 8, border: '1px solid #ddd' }}>Name</th>
-                <th style={{ textAlign: 'left', padding: 8, border: '1px solid #ddd' }}>FQ Name</th>
-                <th style={{ textAlign: 'left', padding: 8, border: '1px solid #ddd' }}>Last Refreshed</th>
-                <th style={{ textAlign: 'left', padding: 8, border: '1px solid #ddd' }}>Tags</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assets.map((asset, index) => (
-                <tr key={index}>
-                  <td style={{ padding: 8, border: '1px solid #ddd' }}>{asset.name}</td>
-                  <td style={{ padding: 8, border: '1px solid #ddd' }}>{asset.fq_name || '-'}</td>
-                  <td style={{ padding: 8, border: '1px solid #ddd' }}>{asset.last_refreshed || '-'}</td>
-                  <td style={{ padding: 8, border: '1px solid #ddd' }}>{asset.tags?.join(', ') || '-'}</td>
+          <p>Найдено записей: {data.length}</p>
+          {data.length > 0 && (
+            <table style={{ borderCollapse: 'collapse', width: '100%', border: '1px solid #ddd' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f5f5f5' }}>
+                  <th style={{ padding: 8, border: '1px solid #ddd' }}>Name</th>
+                  <th style={{ padding: 8, border: '1px solid #ddd' }}>FQ Name</th>
+                  <th style={{ padding: 8, border: '1px solid #ddd' }}>Last Refreshed</th>
+                  <th style={{ padding: 8, border: '1px solid #ddd' }}>Tags</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((item, index) => (
+                  <tr key={index}>
+                    <td style={{ padding: 8, border: '1px solid #ddd' }}>{item.name}</td>
+                    <td style={{ padding: 8, border: '1px solid #ddd' }}>{item.fq_name || '-'}</td>
+                    <td style={{ padding: 8, border: '1px solid #ddd' }}>{item.last_refreshed || '-'}</td>
+                    <td style={{ padding: 8, border: '1px solid #ddd' }}>{item.tags?.join(', ') || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
     </main>
