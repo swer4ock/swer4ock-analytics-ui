@@ -1,7 +1,4 @@
 // src/app/assets/page.tsx
-'use client';
-
-import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
 type Asset = {
@@ -12,30 +9,28 @@ type Asset = {
   last_refreshed: string | null;
 };
 
-export default function AssetsPage() {
-  const [rows, setRows] = useState<Asset[]>([]);
-  const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+async function getAssets() {
+  const { data, error } = await supabase
+    .from('v_ready_assets')
+    .select('*')
+    .order('last_refreshed', { ascending: false, nullsFirst: false });
 
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from('v_ready_assets') // analytics.v_ready_assets (экспортируется как v_ready_assets)
-        .select('*')
-        .order('last_refreshed', { ascending: false, nullsFirst: false });
+  if (error) {
+    console.error('Error fetching assets:', error);
+    return [];
+  }
 
-      if (error) setErr(error.message);
-      else setRows((data as Asset[]) ?? []);
-      setLoading(false);
-    })();
-  }, []);
+  return data as Asset[];
+}
+
+export default async function AssetsPage() {
+  const rows = await getAssets();
 
   return (
     <main style={{ padding: 24, fontFamily: 'ui-sans-serif, system-ui' }}>
       <h1>Готовые датасеты</h1>
-      {loading && <p>Загрузка…</p>}
-      {err && <p style={{ color: 'crimson' }}>Ошибка: {err}</p>}
-      {!loading && !err && (
+      {rows.length === 0 && <p>Данных пока нет.</p>}
+      {rows.length > 0 && (
         <table style={{ borderCollapse: 'collapse', width: '100%' }}>
           <thead>
             <tr>
