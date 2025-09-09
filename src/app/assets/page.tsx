@@ -19,7 +19,7 @@ export default function AssetsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.rpc('get_ready_assets');
+      const { data, error } = await supabase.rpc('get_ready_assets_test');
 
       if (error) setErr(error.message);
       else setRows((data as Asset[]) ?? []);
