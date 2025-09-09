@@ -21,7 +21,11 @@ export default function PulsePage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.rpc('get_ads_pulse');
+      const { data, error } = await supabase
+        .from('v_ads_pulse') // sales.v_ads_pulse (экспортируется как v_ads_pulse)
+        .select('*')
+        .order('report_date', { ascending: false })
+        .limit(30);
 
       if (error) setErr(error.message);
       else setRows((data as PulseRow[]) ?? []);
