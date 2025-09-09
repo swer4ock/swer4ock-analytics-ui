@@ -27,7 +27,7 @@ export default function HomePage() {
           IT отдел CRM | Frontend разработчик | Supabase + Vercel
         </p>
       </div>
-
+      
       <section style={{ marginBottom: 48 }}>
         <h2 style={{
           fontSize: "28px",
@@ -205,6 +205,216 @@ export default function HomePage() {
               </p>
             </div>
           </a>
+
+          {/* Pulse */}
+          <a href="/pulse" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #dc3545",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#dc3545",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  ⚡
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    Ads Pulse
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /pulse
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Реал-тайм мониторинг объявлений с автоматическим обновлением данных.
+              </p>
+            </div>
+          </a>
+
+          {/* Dashboard */}
+          <a href="/dashboard" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #6c757d",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#6c757d",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  🧭
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    Основной дашборд (MVP)
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /dashboard
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Центральная панель аналитики с быстрыми ссылками.
+              </p>
+            </div>
+          </a>
+
+          {/* Analytics Dashboard (advanced) */}
+          <a href="/analytics-dashboard" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #007bff",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#007bff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  📈
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    Расширенная аналитика
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /analytics-dashboard
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Продвинутые аналитические инструменты и визуализации.
+              </p>
+            </div>
+          </a>
+
+          {/* Instruments */}
+          <a href="/instruments" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #17a2b8",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#17a2b8",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  🛠️
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    Инструменты
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /instruments
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Утилиты для работы с данными и настройками системы.
+              </p>
+            </div>
+          </a>
+
+          {/* IT Dashboard */}
+          <a href="/it-dashboard" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #6f42c1",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#6f42c1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  👥
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    IT Dashboard
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /it-dashboard
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Внутренняя панель для команды IT: статус, метрики, задачи.
+              </p>
+            </div>
+          </a>
         </div>
       </section>
 
@@ -215,7 +425,7 @@ export default function HomePage() {
         borderRadius: 16,
         textAlign: "center"
       }}>
-        <h3 style={{ marginBottom: 16 }}>�� Swer4ock Analytics Platform</h3>
+        <h3 style={{ marginBottom: 16 }}>🎯 Swer4ock Analytics Platform</h3>
         <p style={{ marginBottom: 20, opacity: 0.8 }}>
           Профессиональная аналитика для бизнеса | IT отдел CRM
         </p>
