@@ -1,11 +1,16 @@
 import React from 'react';
-import { supabase } from '@/lib/supabaseClient';
 import { ReadyAsset } from '@/lib/types';
 
-export default async function Assets() {
-  const { data, error } = await supabase.rpc('get_ready_assets')
+async function getAssets(): Promise<ReadyAsset[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/data?type=assets`, { cache: 'no-store' });
+  if (!res.ok) {
+    throw new Error('Failed to fetch assets');
+  }
+  return res.json();
+}
 
-  if (error) return <pre>{error.message}</pre>
+export default async function Assets() {
+  const data = await getAssets();
 
   return (
     <main style={{padding:20}}>

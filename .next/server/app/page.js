@@ -89,72 +89,6 @@ module.exports = require("next/dist/compiled/next-server/app-page.runtime.dev.js
 
 /***/ }),
 
-/***/ "http":
-/*!***********************!*\
-  !*** external "http" ***!
-  \***********************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("http");
-
-/***/ }),
-
-/***/ "https":
-/*!************************!*\
-  !*** external "https" ***!
-  \************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("https");
-
-/***/ }),
-
-/***/ "punycode":
-/*!***************************!*\
-  !*** external "punycode" ***!
-  \***************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("punycode");
-
-/***/ }),
-
-/***/ "stream":
-/*!*************************!*\
-  !*** external "stream" ***!
-  \*************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("stream");
-
-/***/ }),
-
-/***/ "url":
-/*!**********************!*\
-  !*** external "url" ***!
-  \**********************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("url");
-
-/***/ }),
-
-/***/ "zlib":
-/*!***********************!*\
-  !*** external "zlib" ***!
-  \***********************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("zlib");
-
-/***/ }),
-
 /***/ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D! ***!
@@ -204,18 +138,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ Page)\n/* harmony export */ });\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js\");\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react.js\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _lib_supabaseClient__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/lib/supabaseClient */ \"(rsc)/./src/lib/supabaseClient.ts\");\n\n\n\nasync function Page() {\n    const { data, error } = await _lib_supabaseClient__WEBPACK_IMPORTED_MODULE_2__.supabase.rpc(\"get_ready_assets\", {}, {\n        count: \"exact\",\n        head: true\n    }); // Just check if the function is callable\n    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"main\", {\n        style: {\n            padding: 20\n        },\n        children: [\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"h1\", {\n                children: \"Health\"\n            }, void 0, false, {\n                fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n                lineNumber: 9,\n                columnNumber: 7\n            }, this),\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"pre\", {\n                children: JSON.stringify({\n                    url: \"https://uumrjikuqewlakczbnbs.supabase.co\"?.slice(0, 40) + \"...\",\n                    hasData: !!data?.length,\n                    error: error?.message\n                }, null, 2)\n            }, void 0, false, {\n                fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n                lineNumber: 10,\n                columnNumber: 7\n            }, this)\n        ]\n    }, void 0, true, {\n        fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n        lineNumber: 8,\n        columnNumber: 5\n    }, this);\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvYXBwL3BhZ2UudHN4IiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFBMEI7QUFDcUI7QUFFaEMsZUFBZUU7SUFDNUIsTUFBTSxFQUFFQyxJQUFJLEVBQUVDLEtBQUssRUFBRSxHQUFHLE1BQU1ILHlEQUFRQSxDQUFDSSxHQUFHLENBQUMsb0JBQW9CLENBQUMsR0FBRztRQUFFQyxPQUFPO1FBQVNDLE1BQU07SUFBSyxJQUFJLHlDQUF5QztJQUU3SSxxQkFDRSw4REFBQ0M7UUFBS0MsT0FBTztZQUFDQyxTQUFRO1FBQUU7OzBCQUN0Qiw4REFBQ0M7MEJBQUc7Ozs7OzswQkFDSiw4REFBQ0M7MEJBQ0VDLEtBQUtDLFNBQVMsQ0FBQztvQkFDZEMsS0FBS0MsMENBQW9DLEVBQUVHLE1BQU0sR0FBRSxNQUFNO29CQUN6REMsU0FBUyxDQUFDLENBQUNqQixNQUFNa0I7b0JBQVFqQixPQUFPQSxPQUFPa0I7Z0JBQ3pDLEdBQUcsTUFBTTs7Ozs7Ozs7Ozs7O0FBSWpCIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vc3dlcjRvY2stYW5hbHl0aWNzLXVpLy4vc3JjL2FwcC9wYWdlLnRzeD9mNjhhIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBzdXBhYmFzZSB9IGZyb20gJ0AvbGliL3N1cGFiYXNlQ2xpZW50J1xuXG5leHBvcnQgZGVmYXVsdCBhc3luYyBmdW5jdGlvbiBQYWdlKCkge1xuICBjb25zdCB7IGRhdGEsIGVycm9yIH0gPSBhd2FpdCBzdXBhYmFzZS5ycGMoJ2dldF9yZWFkeV9hc3NldHMnLCB7fSwgeyBjb3VudDogJ2V4YWN0JywgaGVhZDogdHJ1ZSB9KTsgLy8gSnVzdCBjaGVjayBpZiB0aGUgZnVuY3Rpb24gaXMgY2FsbGFibGVcblxuICByZXR1cm4gKFxuICAgIDxtYWluIHN0eWxlPXt7cGFkZGluZzoyMH19PlxuICAgICAgPGgxPkhlYWx0aDwvaDE+XG4gICAgICA8cHJlPlxuICAgICAgICB7SlNPTi5zdHJpbmdpZnkoe1xuICAgICAgICAgIHVybDogcHJvY2Vzcy5lbnYuTkVYVF9QVUJMSUNfU1VQQUJBU0VfVVJMPy5zbGljZSgwLDQwKSArICcuLi4nLFxuICAgICAgICAgIGhhc0RhdGE6ICEhZGF0YT8ubGVuZ3RoLCBlcnJvcjogZXJyb3I/Lm1lc3NhZ2VcbiAgICAgICAgfSwgbnVsbCwgMil9XG4gICAgICA8L3ByZT5cbiAgICA8L21haW4+XG4gIClcbn1cbiJdLCJuYW1lcyI6WyJSZWFjdCIsInN1cGFiYXNlIiwiUGFnZSIsImRhdGEiLCJlcnJvciIsInJwYyIsImNvdW50IiwiaGVhZCIsIm1haW4iLCJzdHlsZSIsInBhZGRpbmciLCJoMSIsInByZSIsIkpTT04iLCJzdHJpbmdpZnkiLCJ1cmwiLCJwcm9jZXNzIiwiZW52IiwiTkVYVF9QVUJMSUNfU1VQQUJBU0VfVVJMIiwic2xpY2UiLCJoYXNEYXRhIiwibGVuZ3RoIiwibWVzc2FnZSJdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(rsc)/./src/app/page.tsx\n");
-
-/***/ }),
-
-/***/ "(rsc)/./src/lib/supabaseClient.ts":
-/*!***********************************!*\
-  !*** ./src/lib/supabaseClient.ts ***!
-  \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   supabase: () => (/* binding */ supabase)\n/* harmony export */ });\n/* harmony import */ var _supabase_supabase_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @supabase/supabase-js */ \"(rsc)/./node_modules/@supabase/supabase-js/dist/module/index.js\");\n\nconst supabase = (0,_supabase_supabase_js__WEBPACK_IMPORTED_MODULE_0__.createClient)(\"https://uumrjikuqewlakczbnbs.supabase.co\", \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bXJqaWt1cWV3bGFrY3pibmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNjgxOTMsImV4cCI6MjA3Mjc0NDE5M30.lpuqnqFKVtndmIk92XQrdy0dlnshepHWcS4CDdRH4eA\", {\n    auth: {\n        persistSession: false\n    }\n});\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvbGliL3N1cGFiYXNlQ2xpZW50LnRzIiwibWFwcGluZ3MiOiI7Ozs7O0FBQW9EO0FBRTdDLE1BQU1DLFdBQVdELG1FQUFZQSxDQUNsQ0UsMENBQW9DLEVBQ3BDQSxrTkFBeUMsRUFDekM7SUFBRUksTUFBTTtRQUFFQyxnQkFBZ0I7SUFBTTtBQUFFLEdBQ25DIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vc3dlcjRvY2stYW5hbHl0aWNzLXVpLy4vc3JjL2xpYi9zdXBhYmFzZUNsaWVudC50cz9mOWQ3Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGNyZWF0ZUNsaWVudCB9IGZyb20gJ0BzdXBhYmFzZS9zdXBhYmFzZS1qcydcblxuZXhwb3J0IGNvbnN0IHN1cGFiYXNlID0gY3JlYXRlQ2xpZW50KFxuICBwcm9jZXNzLmVudi5ORVhUX1BVQkxJQ19TVVBBQkFTRV9VUkwhLFxuICBwcm9jZXNzLmVudi5ORVhUX1BVQkxJQ19TVVBBQkFTRV9BTk9OX0tFWSEsXG4gIHsgYXV0aDogeyBwZXJzaXN0U2Vzc2lvbjogZmFsc2UgfSB9XG4pXG4iXSwibmFtZXMiOlsiY3JlYXRlQ2xpZW50Iiwic3VwYWJhc2UiLCJwcm9jZXNzIiwiZW52IiwiTkVYVF9QVUJMSUNfU1VQQUJBU0VfVVJMIiwiTkVYVF9QVUJMSUNfU1VQQUJBU0VfQU5PTl9LRVkiLCJhdXRoIiwicGVyc2lzdFNlc3Npb24iXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./src/lib/supabaseClient.ts\n");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ Page)\n/* harmony export */ });\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js\");\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react.js\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);\n\n\nfunction Page() {\n    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"main\", {\n        style: {\n            padding: 20\n        },\n        children: [\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"h1\", {\n                children: \"Health Check\"\n            }, void 0, false, {\n                fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n                lineNumber: 6,\n                columnNumber: 7\n            }, this),\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"p\", {\n                children: \"Application is running. Check /assets and /pulse for data.\"\n            }, void 0, false, {\n                fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n                lineNumber: 7,\n                columnNumber: 7\n            }, this),\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"p\", {\n                children: [\n                    \"Supabase URL: \",\n                    \"https://uumrjikuqewlakczbnbs.supabase.co\"?.slice(0, 40),\n                    \"...\"\n                ]\n            }, void 0, true, {\n                fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n                lineNumber: 8,\n                columnNumber: 7\n            }, this)\n        ]\n    }, void 0, true, {\n        fileName: \"/Users/macbookpro/Desktop/defires/yandex_market/telefon_1/swer4ock-analytics-ui/src/app/page.tsx\",\n        lineNumber: 5,\n        columnNumber: 5\n    }, this);\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvYXBwL3BhZ2UudHN4IiwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUEwQjtBQUVYLFNBQVNDO0lBQ3RCLHFCQUNFLDhEQUFDQztRQUFLQyxPQUFPO1lBQUNDLFNBQVE7UUFBRTs7MEJBQ3RCLDhEQUFDQzswQkFBRzs7Ozs7OzBCQUNKLDhEQUFDQzswQkFBRTs7Ozs7OzBCQUNILDhEQUFDQTs7b0JBQUU7b0JBQWVDLDBDQUFvQyxFQUFFRyxNQUFNLEdBQUU7b0JBQUk7Ozs7Ozs7Ozs7Ozs7QUFHMUUiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9zd2VyNG9jay1hbmFseXRpY3MtdWkvLi9zcmMvYXBwL3BhZ2UudHN4P2Y2OGEiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0JztcblxuZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gUGFnZSgpIHtcbiAgcmV0dXJuIChcbiAgICA8bWFpbiBzdHlsZT17e3BhZGRpbmc6MjB9fT5cbiAgICAgIDxoMT5IZWFsdGggQ2hlY2s8L2gxPlxuICAgICAgPHA+QXBwbGljYXRpb24gaXMgcnVubmluZy4gQ2hlY2sgL2Fzc2V0cyBhbmQgL3B1bHNlIGZvciBkYXRhLjwvcD5cbiAgICAgIDxwPlN1cGFiYXNlIFVSTDoge3Byb2Nlc3MuZW52Lk5FWFRfUFVCTElDX1NVUEFCQVNFX1VSTD8uc2xpY2UoMCw0MCl9Li4uPC9wPlxuICAgIDwvbWFpbj5cbiAgKVxufVxuIl0sIm5hbWVzIjpbIlJlYWN0IiwiUGFnZSIsIm1haW4iLCJzdHlsZSIsInBhZGRpbmciLCJoMSIsInAiLCJwcm9jZXNzIiwiZW52IiwiTkVYVF9QVUJMSUNfU1VQQUJBU0VfVVJMIiwic2xpY2UiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./src/app/page.tsx\n");
 
 /***/ })
 
@@ -226,7 +149,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 var __webpack_require__ = require("../webpack-runtime.js");
 __webpack_require__.C(exports);
 var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/@supabase","vendor-chunks/@swc","vendor-chunks/whatwg-url","vendor-chunks/tr46","vendor-chunks/webidl-conversions"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!")));
+var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/@swc"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmacbookpro%2FDesktop%2Fdefires%2Fyandex_market%2Ftelefon_1%2Fswer4ock-analytics-ui&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!")));
 module.exports = __webpack_exports__;
 
 })();

@@ -1,11 +1,16 @@
 import React from 'react';
-import { supabase } from '@/lib/supabaseClient';
 import { AdsPulse } from '@/lib/types';
 
-export default async function Pulse() {
-  const { data, error } = await supabase.rpc('get_ads_pulse')
+async function getPulse(): Promise<AdsPulse[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/data?type=pulse`, { cache: 'no-store' });
+  if (!res.ok) {
+    throw new Error('Failed to fetch pulse data');
+  }
+  return res.json();
+}
 
-  if (error) return <pre>{error.message}</pre>
+export default async function Pulse() {
+  const data = await getPulse();
 
   return (
     <main style={{padding:20}}>
