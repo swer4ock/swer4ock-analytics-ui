@@ -1,35 +1,62 @@
-import React from 'react';
-import { ReadyAsset } from '@/lib/types';
+// src/app/assets/page.tsx
+'use client';
 
-async function getAssets(): Promise<ReadyAsset[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/data?type=assets`, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error('Failed to fetch assets');
-  }
-  return res.json();
-}
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
-export default async function Assets() {
-  const data = await getAssets();
+type Asset = {
+  name: string;
+  fq_name: string | null;
+  description: string | null;
+  tags: string[] | null;
+  last_refreshed: string | null;
+};
+
+export default function AssetsPage() {
+  const [rows, setRows] = useState<Asset[]>([]);
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('v_ready_assets') // analytics.v_ready_assets (экспортируется как v_ready_assets)
+        .select('*')
+        .order('last_refreshed', { ascending: false, nullsFirst: false });
+
+      if (error) setErr(error.message);
+      else setRows((data as Asset[]) ?? []);
+      setLoading(false);
+    })();
+  }, []);
 
   return (
-    <main style={{padding:20}}>
-      <h1>Ready Assets</h1>
-      <table>
-        <thead>
-          <tr><th>Name</th><th>FQ name</th><th>Tags</th><th>Refreshed</th></tr>
-        </thead>
-        <tbody>
-          {(data as ReadyAsset[])?.map((r: ReadyAsset, i: number) => (
-            <tr key={i}>
-              <td>{r.name}</td>
-              <td>{r.fq_name}</td>
-              <td>{(r.tags || []).join(', ')}</td>
-              <td>{r.last_refreshed ?? ''}</td>
+    <main style={{ padding: 24, fontFamily: 'ui-sans-serif, system-ui' }}>
+      <h1>Готовые датасеты</h1>
+      {loading && <p>Загрузка…</p>}
+      {err && <p style={{ color: 'crimson' }}>Ошибка: {err}</p>}
+      {!loading && !err && (
+        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'left', padding: 8 }}>name</th>
+              <th style={{ textAlign: 'left', padding: 8 }}>fq_name</th>
+              <th style={{ textAlign: 'left', padding: 8 }}>last_refreshed</th>
+              <th style={{ textAlign: 'left', padding: 8 }}>tags</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i}>
+                <td style={{ padding: 8, borderTop: '1px solid #eee' }}>{r.name}</td>
+                <td style={{ padding: 8, borderTop: '1px solid #eee' }}>{r.fq_name ?? '-'}</td>
+                <td style={{ padding: 8, borderTop: '1px solid #eee' }}>{r.last_refreshed ?? '-'}</td>
+                <td style={{ padding: 8, borderTop: '1px solid #eee' }}>{r.tags?.join(', ') ?? '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </main>
-  )
+  );
 }
