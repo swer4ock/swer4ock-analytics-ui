@@ -1,0 +1,18 @@
+{
+  "/auth/confirm/route": "/auth/confirm",
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/opengraph-image.png/route": "/opengraph-image.png",
+  "/twitter-image.png/route": "/twitter-image.png",
+  "/auth/login/page": "/auth/login",
+  "/auth/update-password/page": "/auth/update-password",
+  "/auth/error/page": "/auth/error",
+  "/auth/sign-up/page": "/auth/sign-up",
+  "/todos/page": "/todos",
+  "/auth/sign-up-success/page": "/auth/sign-up-success",
+  "/auth/forgot-password/page": "/auth/forgot-password",
+  "/page": "/",
+  "/dashboard/page": "/dashboard",
+  "/instruments/page": "/instruments",
+  "/protected/page": "/protected"
+}
