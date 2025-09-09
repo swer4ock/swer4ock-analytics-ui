@@ -1,18 +1,1 @@
-{
-  "/auth/confirm/route": "/auth/confirm",
-  "/_not-found/page": "/_not-found",
-  "/favicon.ico/route": "/favicon.ico",
-  "/opengraph-image.png/route": "/opengraph-image.png",
-  "/twitter-image.png/route": "/twitter-image.png",
-  "/auth/login/page": "/auth/login",
-  "/auth/update-password/page": "/auth/update-password",
-  "/auth/error/page": "/auth/error",
-  "/auth/sign-up/page": "/auth/sign-up",
-  "/todos/page": "/todos",
-  "/auth/sign-up-success/page": "/auth/sign-up-success",
-  "/auth/forgot-password/page": "/auth/forgot-password",
-  "/page": "/",
-  "/dashboard/page": "/dashboard",
-  "/instruments/page": "/instruments",
-  "/protected/page": "/protected"
-}
+{"/_not-found/page":"/_not-found","/page":"/","/analytics-dashboard/page":"/analytics-dashboard","/it-dashboard/page":"/it-dashboard","/instruments/page":"/instruments","/dashboard/page":"/dashboard","/pulse/page":"/pulse","/analytics/page":"/analytics","/assets/page":"/assets","/analytics-guide/page":"/analytics-guide"}
