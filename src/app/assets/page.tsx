@@ -43,7 +43,7 @@ export default function AssetsPage() {
                 throw new Error('Missing environment variables');
               }
 
-              const response = await fetch(url + '/rest/v1/rpc/hello_world', {
+              const response = await fetch(url + '/rest/v1/rpc/get_assets_data', {
                 method: 'POST',
                 headers: {
                   'apikey': key,
