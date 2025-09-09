@@ -19,10 +19,7 @@ export default function AssetsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase
-        .from('v_ready_assets') // analytics.v_ready_assets (экспортируется как v_ready_assets)
-        .select('*')
-        .order('last_refreshed', { ascending: false, nullsFirst: false });
+      const { data, error } = await supabase.rpc('get_ready_assets');
 
       if (error) setErr(error.message);
       else setRows((data as Asset[]) ?? []);
