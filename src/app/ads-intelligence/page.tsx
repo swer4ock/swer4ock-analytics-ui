@@ -169,6 +169,7 @@ export default function AdsIntelligencePage() {
                     <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>ID объявления</th>
                     <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Объявление</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Город</th>
+                    <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Сумма ставки</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Контакты</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Конверсия</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>CPL (₽)</th>
@@ -190,6 +191,9 @@ export default function AdsIntelligencePage() {
                         <div style={{ fontSize: 12, color: '#6c757d' }}>{ad.category}</div>
                       </td>
                       <td style={{ padding: 12, textAlign: 'center', fontSize: 14 }}>{ad.city}</td>
+                      <td style={{ padding: 12, textAlign: 'center', fontSize: 14, fontWeight: 600 }}>
+                        {ad.current_bid ? ad.current_bid.toFixed(0) : '—'} ₽
+                      </td>
                       <td style={{ padding: 12, textAlign: 'center', fontSize: 16, fontWeight: 600 }}>{ad.contacts}</td>
                       <td style={{ padding: 12, textAlign: 'center' }}>
                         <span style={{ 
