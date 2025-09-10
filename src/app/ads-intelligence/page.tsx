@@ -81,7 +81,7 @@ export default function AdsIntelligencePage() {
 
         const [ads, cats, geo, recs] = await Promise.all([
           rpcPreferV1<AdPerformance[]>("get_unified_ads_performance", { p_company: company, p_limit: 25 }),
-          rpcPreferV1<CategoryAnalysis[]>("get_top_categories_analysis", { p_company: company, p_limit: 8 }),
+          rpcPreferV1<CategoryAnalysis[]>("get_avito_positions_analysis", { p_limit: 8 }),
           rpcPreferV1<GeoAnalysis[]>("get_geo_profitability_analysis", { p_company: company, p_limit: 10 }),
           rpcPreferV1<Recommendation[]>("get_optimization_recommendations", { p_company: company, p_limit: 15 }),
         ]);

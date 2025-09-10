@@ -73,7 +73,7 @@ function AvitoAnalyticsComponent() {
         const [c, s, t] = await Promise.all([
           rpcPreferV1<ContactRow[]>("get_avito_contacts", { p_company: company, p_days: days, p_city: cityParam }),
           rpcPreferV1<StrategyRow[]>("get_avito_cpl_by_strategy", { p_company: company, p_days: days }),
-          rpcPreferV1<CityRow[]>("get_avito_top_cities", { p_company: company, p_limit: 10 }),
+          rpcPreferV1<CityRow[]>("get_avito_top_cities_sales", { p_limit: 10 }),
         ]);
         if (!mounted) return;
         setContacts(c);
