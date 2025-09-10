@@ -236,6 +236,24 @@ https://vercel.com/marsels-projects/swer4ock-analytics-ui
 **GitHub (код/issue):**
 https://github.com/swer4ock/swer4ock-analytics-ui
 
+## 13) Health Check (/health) и отчетность IT
+
+### /health — страница здоровья системы
+- Маршрут: `/health`
+- Проверяет ENV: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Проверяет RPC: `get_development_status`, `get_recent_commits`, `get_analytics_summary`, `get_city_performance`, `get_strategy_monitoring`, `get_avito_sales_summary`
+- Проверяет VIEW: `public.v_ceo_dashboard`
+- Интерпретация: зеленый (OK) / красный (ISSUES) с текстом ошибки
+
+Частые причины проблем:
+- PGRST203 (300) — перегруженные функции (overloading) не поддерживаются PostgREST. Решение: создать wrapper-функции с уникальными именами (например, `*_v1`) и выдать `GRANT EXECUTE TO anon`.
+- 401/403 — проверьте ENV в Vercel (Production) и права EXECUTE/SELECT для роли `anon`.
+
+### Регламент отчетности в IT отдел
+- Ежедневно: короткий апдейт (что сделано / в работе / блокеры + ссылка на деплой)
+- Еженедельно: сводка (коммиты/фичи/фиксы/документация/активные задачи + ссылки)
+- Инциденты: приложить ссылку на `/health` и Runtime Logs в Vercel
+
 ---
 
 ## Коротко: что делать прямо сейчас фронтендеру

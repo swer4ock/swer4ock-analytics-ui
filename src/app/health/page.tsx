@@ -24,18 +24,32 @@ export default async function HealthPage() {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   };
 
-  const checks = await Promise.allSettled([
-    // Core RPCs used around the app
-    rpc("get_development_status").then(() => ({ name: "get_development_status", pass: true })).catch((e) => ({ name: "get_development_status", pass: false, error: String(e) })),
-    rpc("get_recent_commits", { p_limit: 1 }).then(() => ({ name: "get_recent_commits", pass: true })).catch((e) => ({ name: "get_recent_commits", pass: false, error: String(e) })),
-    rpc("get_analytics_summary").then(() => ({ name: "get_analytics_summary", pass: true })).catch((e) => ({ name: "get_analytics_summary", pass: false, error: String(e) })),
-    rpc("get_city_performance", { p_limit: 1 }).then(() => ({ name: "get_city_performance", pass: true })).catch((e) => ({ name: "get_city_performance", pass: false, error: String(e) })),
-    rpc("get_strategy_monitoring", { p_limit: 1 }).then(() => ({ name: "get_strategy_monitoring", pass: true })).catch((e) => ({ name: "get_strategy_monitoring", pass: false, error: String(e) })),
-    rpc("get_avito_sales_summary").then(() => ({ name: "get_avito_sales_summary", pass: true })).catch((e) => ({ name: "get_avito_sales_summary", pass: false, error: String(e) })),
+  async function check(name: string, body?: any) {
+    try {
+      await rpc(name, body);
+      return { name, pass: true };
+    } catch (e: any) {
+      return { name, pass: false, error: String(e?.message ?? e) };
+    }
+  }
+
+  const checks = await Promise.all([
+    // ENV-independent ping list
+    check("get_development_status"),
+    check("get_recent_commits", { p_limit: 1 }),
+    // Prefer v1 + legacy visibility
+    check("get_analytics_summary_v1"),
+    check("get_analytics_summary"),
+    check("get_city_performance_v1", { p_limit: 1 }),
+    check("get_city_performance", { p_limit: 1 }),
+    check("get_strategy_monitoring_v1", { p_limit: 1 }),
+    check("get_strategy_monitoring", { p_limit: 1 }),
+    check("get_avito_sales_summary"),
+    // View via REST
     fetchCeoView().then(() => ({ name: "view:v_ceo_dashboard", pass: true })).catch((e) => ({ name: "view:v_ceo_dashboard", pass: false, error: String(e) })),
   ]);
 
-  const results = checks.map((r) => (r.status === "fulfilled" ? r.value : r.reason));
+  const results = checks; // already shaped
 
   const allOk = env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY && results.every((r: any) => r?.pass);
 

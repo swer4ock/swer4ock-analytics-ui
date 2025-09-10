@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { rpc } from "../../lib/rpc";
+import { rpc, rpcPreferV1 } from "../../lib/rpc";
 
 type Summary = {
   total_ads: number;
@@ -30,19 +30,19 @@ export default async function AnalyticsPage() {
   let strategies: StrategyRow[] = [];
 
   try {
-    summary = await rpc<Summary[]>('get_analytics_summary');
+    summary = await rpcPreferV1<Summary[]>('get_analytics_summary');
   } catch (e: any) {
     console.error(e);
   }
 
   try {
-    cities = await rpc<CityPerf[]>('get_city_performance', { p_limit: 20 });
+    cities = await rpcPreferV1<CityPerf[]>('get_city_performance', { p_limit: 20 });
   } catch (e: any) {
     console.error(e);
   }
 
   try {
-    strategies = await rpc<StrategyRow[]>('get_strategy_monitoring', { p_limit: 50 });
+    strategies = await rpcPreferV1<StrategyRow[]>('get_strategy_monitoring', { p_limit: 50 });
   } catch (e: any) {
     console.error(e);
   }
