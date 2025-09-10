@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { rpcPreferV1 } from "@/lib/rpc";
 
@@ -27,21 +27,21 @@ interface CityRow {
   contacts: number;
 }
 
-function AvitoAnalyticsComponent() {
+export default function AvitoAnalyticsPage() {
   const search = useSearchParams();
   const router = useRouter();
 
-  const [company, setCompany] = React.useState<CompanyCode>("seltka");
-  const [days, setDays] = React.useState<number>(7);
-  const [city, setCity] = React.useState<string>("");
+  const [company, setCompany] = useState<CompanyCode>("seltka");
+  const [days, setDays] = useState<number>(7);
+  const [city, setCity] = useState<string>("");
 
-  const [contacts, setContacts] = React.useState<ContactRow[] | null>(null);
-  const [strategies, setStrategies] = React.useState<StrategyRow[] | null>(null);
-  const [topCities, setTopCities] = React.useState<CityRow[] | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [contacts, setContacts] = useState<ContactRow[] | null>(null);
+  const [strategies, setStrategies] = useState<StrategyRow[] | null>(null);
+  const [topCities, setTopCities] = useState<CityRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Инициализация из URL
-  React.useEffect(() => {
+  useEffect(() => {
     const qCompany = (search.get("company") as CompanyCode) || undefined;
     const qDays = search.get("days");
     const qCity = search.get("city") || undefined;
@@ -52,7 +52,7 @@ function AvitoAnalyticsComponent() {
   }, []);
 
   // Синхронизация URL
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams();
     params.set("company", company);
     params.set("days", String(days));
@@ -61,7 +61,7 @@ function AvitoAnalyticsComponent() {
     router.replace(`/avito-analytics?${qs}`);
   }, [company, days, city, router]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
     (async () => {
       try {
@@ -93,9 +93,9 @@ function AvitoAnalyticsComponent() {
 
   const isLoading = contacts === null || strategies === null || topCities === null;
 
-  const totalContacts = React.useMemo(() => (contacts || []).reduce((s, r) => s + (r.contacts || 0), 0), [contacts]);
-  const totalCities = React.useMemo(() => (topCities || []).length, [topCities]);
-  const bestStrategy = React.useMemo(() => {
+  const totalContacts = useMemo(() => (contacts || []).reduce((s, r) => s + (r.contacts || 0), 0), [contacts]);
+  const totalCities = useMemo(() => (topCities || []).length, [topCities]);
+  const bestStrategy = useMemo(() => {
     const data = (strategies || []).filter(r => r.cpl !== null);
     if (data.length === 0) return null;
     return data.reduce((best, cur) => (best.cpl! < cur.cpl! ? best : cur));
@@ -241,13 +241,5 @@ function AvitoAnalyticsComponent() {
         </>
       )}
     </main>
-  );
-}
-
-export default function AvitoAnalyticsPage() {
-  return (
-    <Suspense fallback={<div style={{ padding: 32, textAlign: 'center', color: '#6c757d' }}>Загрузка...</div>}>
-      <AvitoAnalyticsComponent />
-    </Suspense>
   );
 }

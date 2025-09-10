@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 export const dynamic = 'force-dynamic';
 
-export default function AvitoMultiCompanyPage() {
+function AvitoMultiComponent() {
   const search = useSearchParams();
   const query = search?.toString();
   const src = query ? `/docs/compani-avito.html?${query}` : "/docs/compani-avito.html";
@@ -17,5 +17,13 @@ export default function AvitoMultiCompanyPage() {
         style={{ border: "none", width: "100%", height: "100vh" }}
       />
     </main>
+  );
+}
+
+export default function AvitoMultiCompanyPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 32, textAlign: 'center', color: '#6c757d' }}>Загрузка...</div>}>
+      <AvitoMultiComponent />
+    </Suspense>
   );
 }
