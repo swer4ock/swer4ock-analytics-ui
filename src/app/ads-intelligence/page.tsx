@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { rpcPreferV1 } from "@/src/lib/rpc";
+import { rpcPreferV1 } from "@/lib/rpc";
 
 type CompanyCode = "seltka" | "iltech" | "mituroom";
 

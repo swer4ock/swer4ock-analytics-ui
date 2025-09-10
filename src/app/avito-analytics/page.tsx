@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { rpcPreferV1 } from "@/src/lib/rpc";
+import { rpcPreferV1 } from "@/lib/rpc";
 
 type CompanyCode = "seltka" | "iltech" | "mituroom";
 
