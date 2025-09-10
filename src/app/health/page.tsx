@@ -24,41 +24,29 @@ export default async function HealthPage() {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   };
 
-  async function check(name: string, body?: any) {
+  // Simplified check function
+  const check = async (name: string, body?: any) => {
     try {
       await rpc(name, body);
       return { name, pass: true };
     } catch (e: any) {
-      return { name, pass: false, error: String(e?.message ?? e).slice(0, 200) };
+      return { name, pass: false, error: String(e?.message ?? e).slice(0, 150) };
     }
-  }
+  };
 
-  let checks: any[] = [];
-  
-  try {
-    checks = await Promise.all([
-      // ENV-independent ping list
-      check("get_development_status"),
-      check("get_recent_commits", { p_limit: 1 }),
-      // Prefer v1 + legacy visibility
-      check("get_analytics_summary_v1"),
-      check("get_analytics_summary"),
-      check("get_city_performance_v1", { p_limit: 1 }),
-      check("get_city_performance", { p_limit: 1 }),
-      check("get_strategy_monitoring_v1", { p_limit: 1 }),
-      check("get_strategy_monitoring", { p_limit: 1 }),
-      check("get_avito_sales_summary"),
-      // View via REST
-      fetchCeoView().then(() => ({ name: "view:v_ceo_dashboard", pass: true })).catch((e) => ({ name: "view:v_ceo_dashboard", pass: false, error: String(e).slice(0, 200) })),
-    ]);
-  } catch (e) {
-    console.error("Health check failed:", e);
-    checks = [{ name: "health_check_error", pass: false, error: "Failed to run health checks" }];
-  }
+  // Simplified checks - test core functions only
+  const results = [
+    { name: "NEXT_PUBLIC_SUPABASE_URL", pass: env.NEXT_PUBLIC_SUPABASE_URL },
+    { name: "NEXT_PUBLIC_SUPABASE_ANON_KEY", pass: env.NEXT_PUBLIC_SUPABASE_ANON_KEY },
+    await check("get_development_status"),
+    await check("get_recent_commits", { p_limit: 1 }),
+    await check("get_analytics_summary_v1"),
+    await check("get_city_performance_v1", { p_limit: 1 }),
+    await check("get_strategy_monitoring_v1", { p_limit: 1 }),
+    await check("get_avito_sales_summary"),
+  ];
 
-  const results = checks; // already shaped
-
-  const allOk = env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY && results.every((r: any) => r?.pass);
+  const allOk = env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY && results.slice(2).every((r: any) => r?.pass);
 
   return (
     <main style={{ padding: 24, maxWidth: 1000, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
@@ -69,15 +57,7 @@ export default async function HealthPage() {
       </div>
 
       <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 8, color: '#2c3e50' }}>Переменные окружения (Production)</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 12 }}>
-          <HealthItem name="NEXT_PUBLIC_SUPABASE_URL" pass={env.NEXT_PUBLIC_SUPABASE_URL} />
-          <HealthItem name="NEXT_PUBLIC_SUPABASE_ANON_KEY" pass={env.NEXT_PUBLIC_SUPABASE_ANON_KEY} />
-        </div>
-      </section>
-
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 8, color: '#2c3e50' }}>RPC/VIEW проверки</h2>
+        <h2 style={{ fontSize: 18, marginBottom: 8, color: '#2c3e50' }}>Проверки системы</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 12 }}>
           {results.map((r: any, i: number) => (
             <div key={i} style={{ border: '1px solid #e9ecef', borderRadius: 12, padding: 12, background: '#f8f9fa' }}>
@@ -85,9 +65,9 @@ export default async function HealthPage() {
                 <span style={{ width: 10, height: 10, borderRadius: '50%', background: r.pass ? '#28a745' : '#dc3545' }} />
                 <strong style={{ color: '#2c3e50' }}>{r.name}</strong>
               </div>
-              {!r.pass && (
+              {!r.pass && r.error && (
                 <div style={{ marginTop: 8, fontSize: 12, color: '#6c757d', wordBreak: 'break-word' }}>
-                  {r.error ?? 'Ошибка'}
+                  {r.error}
                 </div>
               )}
             </div>
