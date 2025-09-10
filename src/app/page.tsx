@@ -415,6 +415,48 @@ export default function HomePage() {
               </p>
             </div>
           </a>
+
+          {/* CEO Dashboard */}
+          <a href="/ceo-dashboard" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #20c997",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#20c997",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  🧠
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    CEO Dashboard
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /ceo-dashboard
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Пульс бизнеса: активные задачи, сделки, поток, AI события.
+              </p>
+            </div>
+          </a>
         </div>
       </section>
 
