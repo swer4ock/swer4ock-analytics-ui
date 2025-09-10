@@ -1,6 +1,6 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-import { rpc } from "../../lib/rpc";
+import { useEffect, useState } from 'react';
 
 type PulseData = {
   total_views: number;
@@ -10,24 +10,51 @@ type PulseData = {
   last_updated: string;
 };
 
-export default async function PulsePage() {
-  let pulseData: PulseData[] = [];
-
-  try {
-    pulseData = await rpc<PulseData[]>('get_avito_sales_summary');
-  } catch (e: any) {
-    console.error('Error fetching pulse data:', e);
-    // Fallback data to prevent page crash
-    pulseData = [{
-      total_views: 0,
-      total_contacts: 0,
-      avg_price: 0,
-      total_ads: 0,
-      last_updated: new Date().toISOString()
-    }];
+async function fetchPulseData(): Promise<PulseData[]> {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/get_avito_sales_summary`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'apikey': apikey,
+      'Authorization': `Bearer ${apikey}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'count=none',
+    },
+    body: '{}',
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw new Error(`RPC failed: ${res.status}`);
   }
+  return res.json();
+}
 
-  const data = pulseData?.[0];
+export default function PulsePage() {
+  const [data, setData] = useState<PulseData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const pulseData = await fetchPulseData();
+        setData(pulseData?.[0] || null);
+      } catch (e) {
+        console.error('Error fetching pulse data:', e);
+        // Fallback data
+        setData({
+          total_views: 0,
+          total_contacts: 0,
+          avg_price: 0,
+          total_ads: 0,
+          last_updated: new Date().toISOString()
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <main style={{ padding: '24px', maxWidth: 1200, margin: '0 auto', fontFamily: 'system-ui, sans-serif' }}>
@@ -92,15 +119,14 @@ export default async function PulsePage() {
               width: 16,
               height: 16,
               borderRadius: '50%',
-              backgroundColor: '#28a745',
-              animation: 'pulse 2s infinite'
+              backgroundColor: loading ? '#ffc107' : '#28a745',
             }}></div>
             <div>
               <h3 style={{ margin: 0, color: '#2c3e50', fontSize: '18px' }}>
-                🔴 СИСТЕМА АКТИВНА
+                {loading ? '🟡 ЗАГРУЗКА' : '🔴 СИСТЕМА АКТИВНА'}
               </h3>
               <p style={{ margin: 4, color: '#6c757d', fontSize: '14px' }}>
-                Мониторинг в реальном времени | Данные обновляются автоматически
+                {loading ? 'Загрузка данных...' : 'Мониторинг в реальном времени | Данные обновляются автоматически'}
               </p>
             </div>
             <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
@@ -108,7 +134,7 @@ export default async function PulsePage() {
                 Последнее обновление
               </p>
               <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#2c3e50' }}>
-                {data ? new Date(data.last_updated).toLocaleString('ru-RU') : 'Загрузка...'}
+                {loading ? 'Загрузка...' : (data ? new Date(data.last_updated).toLocaleString('ru-RU') : 'Нет данных')}
               </p>
             </div>
           </div>

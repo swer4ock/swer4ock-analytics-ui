@@ -1,20 +1,15 @@
-export const dynamic = "force-dynamic";
+'use client';
 
-async function fetchView<T>(): Promise<T[]> {
+import { useEffect, useState } from 'react';
+
+async function fetchCeoView() {
   const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/v_ceo_dashboard?select=*`;
   const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const res = await fetch(url, {
-    headers: {
-      apikey,
-      Authorization: `Bearer ${apikey}`,
-    },
-    // never cache for SSR
-    next: { revalidate: 0 },
+    headers: { apikey, Authorization: `Bearer ${apikey}` },
+    cache: 'no-store',
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Fetch view v_ceo_dashboard failed: ${res.status} ${text}`);
-  }
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
   return res.json();
 }
 
@@ -45,14 +40,24 @@ function fmtMoney(v: number | null | undefined) {
   }
 }
 
-export default async function CeoDashboardPage() {
-  let rows: CeoRow[] = [];
-  try {
-    rows = await fetchView<CeoRow>();
-  } catch (e) {
-    console.error(e);
-  }
-  const data = rows?.[0] || {} as CeoRow;
+export default function CeoDashboardPage() {
+  const [data, setData] = useState<CeoRow>({} as CeoRow);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const rows = await fetchCeoView();
+        setData(rows?.[0] || {} as CeoRow);
+      } catch (e) {
+        console.error(e);
+        setData({} as CeoRow);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <main style={{ padding: "24px", maxWidth: 1200, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
