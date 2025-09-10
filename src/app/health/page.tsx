@@ -33,21 +33,28 @@ export default async function HealthPage() {
     }
   }
 
-  const checks = await Promise.all([
-    // ENV-independent ping list
-    check("get_development_status"),
-    check("get_recent_commits", { p_limit: 1 }),
-    // Prefer v1 + legacy visibility
-    check("get_analytics_summary_v1"),
-    check("get_analytics_summary"),
-    check("get_city_performance_v1", { p_limit: 1 }),
-    check("get_city_performance", { p_limit: 1 }),
-    check("get_strategy_monitoring_v1", { p_limit: 1 }),
-    check("get_strategy_monitoring", { p_limit: 1 }),
-    check("get_avito_sales_summary"),
-    // View via REST
-    fetchCeoView().then(() => ({ name: "view:v_ceo_dashboard", pass: true })).catch((e) => ({ name: "view:v_ceo_dashboard", pass: false, error: String(e) })),
-  ]);
+  let checks: any[] = [];
+  
+  try {
+    checks = await Promise.all([
+      // ENV-independent ping list
+      check("get_development_status"),
+      check("get_recent_commits", { p_limit: 1 }),
+      // Prefer v1 + legacy visibility
+      check("get_analytics_summary_v1"),
+      check("get_analytics_summary"),
+      check("get_city_performance_v1", { p_limit: 1 }),
+      check("get_city_performance", { p_limit: 1 }),
+      check("get_strategy_monitoring_v1", { p_limit: 1 }),
+      check("get_strategy_monitoring", { p_limit: 1 }),
+      check("get_avito_sales_summary"),
+      // View via REST
+      fetchCeoView().then(() => ({ name: "view:v_ceo_dashboard", pass: true })).catch((e) => ({ name: "view:v_ceo_dashboard", pass: false, error: String(e).slice(0, 200) })),
+    ]);
+  } catch (e) {
+    console.error("Health check failed:", e);
+    checks = [{ name: "health_check_error", pass: false, error: "Failed to run health checks" }];
+  }
 
   const results = checks; // already shaped
 
