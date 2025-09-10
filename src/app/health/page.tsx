@@ -29,7 +29,7 @@ export default async function HealthPage() {
       await rpc(name, body);
       return { name, pass: true };
     } catch (e: any) {
-      return { name, pass: false, error: String(e?.message ?? e) };
+      return { name, pass: false, error: String(e?.message ?? e).slice(0, 200) };
     }
   }
 
