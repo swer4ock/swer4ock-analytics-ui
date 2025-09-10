@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мульти-компанейский Дашборд: Эффективность кампаний Авито</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
+        .kpi-card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .chart-container { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); height: 400px; position: relative; }
+        .table-container { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); overflow-x: auto; }
+        th { cursor: pointer; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800">Аналитический Дашборд</h1>
+            <p class="text-lg text-gray-500">Эффективность рекламных кампаний Авито</p>
+        </header>
+
+        <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-wrap items-center gap-4">
+            <label for="company-selector" class="font-semibold text-gray-700">Компания:</label>
+            <select id="company-selector" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></select>
+            <div class="h-6 border-l border-gray-300 mx-2 hidden sm:block"></div>
+            <label for="date-from" class="font-semibold text-gray-700">Период с:</label>
+            <input type="date" id="date-from" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            <label for="date-to" class="font-semibold text-gray-700">по:</label>
+            <input type="date" id="date-to" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            <button id="update-button" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition">Применить</button>
+        </div>
+
+        <div id="kpi-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="chart-container">
+                <h2 class="text-xl font-bold text-gray-700 text-center mb-4">Эффективность по Городам</h2>
+                <canvas id="cityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2 class="text-xl font-bold text-gray-700 text-center mb-4">Распределение контактов по Стратегиям</h2>
+                <canvas id="strategyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container mb-8" style="height: 450px;">
+            <h2 class="text-xl font-bold text-gray-700 text-center mb-4">Динамика Контактов и Затрат</h2>
+            <canvas id="timeChart"></canvas>
+        </div>
+
+        <div class="table-container">
+             <h2 class="text-xl font-bold text-gray-700 text-center p-6">Детализация по Объявлениям</h2>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr id="table-header"></tr>
+                </thead>
+                <tbody id="ads-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const MOCK_DATA = {
+        companies: [
+            { id: 'technostroy', name: 'ТехноСтрой' },
+            { id: 'avtospec', name: 'АвтоСпец' }
+        ],
+        ads: [
+            { "companyId": "technostroy", "date": "2025-08-15", "ad_id": "ad001", "title": "Аренда Экскаватора", "city": "Казань", "strategy": "priority", "contacts": 5, "views": 250, "impressions": 5000, "cost": 1500 },
+            { "companyId": "technostroy", "date": "2025-08-16", "ad_id": "ad002", "title": "Продажа Щебня", "city": "Набережные Челны", "strategy": "major", "contacts": 3, "views": 180, "impressions": 4000, "cost": 900 },
+            { "companyId": "avtospec", "date": "2025-08-18", "ad_id": "ad003", "title": "Услуги Манипулятора", "city": "Казань", "strategy": "standard", "contacts": 2, "views": 120, "impressions": 3000, "cost": 500 },
+            { "companyId": "technostroy", "date": "2025-08-20", "ad_id": "ad004", "title": "Доставка Песка", "city": "Альметьевск", "strategy": "priority", "contacts": 4, "views": 200, "impressions": 4500, "cost": 1200 },
+            { "companyId": "technostroy", "date": "2025-08-22", "ad_id": "ad001", "title": "Аренда Экскаватора", "city": "Казань", "strategy": "priority", "contacts": 6, "views": 300, "impressions": 6000, "cost": 1800 },
+            { "companyId": "avtospec", "date": "2025-08-25", "ad_id": "ad005", "title": "Вывоз Мусора", "city": "Нижнекамск", "strategy": "standard", "contacts": 1, "views": 80, "impressions": 2000, "cost": 300 },
+            { "companyId": "avtospec", "date": "2025-08-28", "ad_id": "ad002", "title": "Продажа Щебня", "city": "Набережные Челны", "strategy": "major", "contacts": 4, "views": 220, "impressions": 4800, "cost": 1100 },
+            { "companyId": "technostroy", "date": "2025-09-01", "ad_id": "ad001", "title": "Аренда Экскаватора", "city": "Казань", "strategy": "priority", "contacts": 7, "views": 350, "impressions": 7000, "cost": 2100 },
+            { "companyId": "avtospec", "date": "2025-09-03", "ad_id": "ad003", "title": "Услуги Манипулятора", "city": "Казань", "strategy": "standard", "contacts": 3, "views": 150, "impressions": 3500, "cost": 600 },
+            { "companyId": "technostroy", "date": "2025-09-05", "ad_id": "ad004", "title": "Доставка Песка", "city": "Альметьевск", "strategy": "priority", "contacts": 5, "views": 250, "impressions": 5500, "cost": 1500 },
+            { "companyId": "avtospec", "date": "2025-09-08", "ad_id": "ad006", "title": "Аренда Самосвала", "city": "Казань", "strategy": "major", "contacts": 4, "views": 210, "impressions": 4200, "cost": 1000 }
+        ]
+    };
+
+    let charts = {};
+    let currentSort = { key: 'cost', direction: 'desc' };
+    let cityFilter = null; // e.g. 'Казань' or null
+
+    // Отображаемые компании для пользователя
+    const COMPANY_ALIASES = {
+      // исходные id в MOCK_DATA -> пользовательские id
+      technostroy: 'seltka',
+      avtospec: 'iltech',
+    };
+
+    // Читаем параметры URL (q, company, city, days)
+    function getURLParams() {
+      const url = new URL(window.location.href);
+      return {
+        q: url.searchParams.get('q'),
+        company: url.searchParams.get('company'),
+        city: url.searchParams.get('city'),
+        days: url.searchParams.get('days'),
+      };
+    }
+
+    function normalizeCompanyForData(userCompany) {
+      // Преобразуем пользовательские: seltka/iltech/mituroom -> исходные companyId из MOCK_DATA
+      // В данных нет mituroom — вернём null, фильтр даст пусто (это ок для демо)
+      if (!userCompany) return null;
+      if (userCompany === 'seltka') return 'technostroy';
+      if (userCompany === 'iltech') return 'avtospec';
+      if (userCompany === 'mituroom') return null;
+      return null;
+    }
+
+    function populateCompanySelector() {
+        const selector = document.getElementById('company-selector');
+        selector.innerHTML = `<option value="all">Все Компании</option>`;
+        // Отображаем пользовательские компании
+        const userCompanies = [
+          { id: 'seltka', name: 'Сэлтка (Кирилл)' },
+          { id: 'iltech', name: 'Ильтех (Ильнур)' },
+          { id: 'mituroom', name: 'mituroom (Артем)' },
+        ];
+        userCompanies.forEach(company => {
+            selector.innerHTML += `<option value="${company.id}">${company.name}</option>`;
+        });
+        selector.addEventListener('change', updateDashboard);
+    }
+
+    function getFilteredData() {
+        const selectedCompany = document.getElementById('company-selector').value;
+        const from = new Date(document.getElementById('date-from').value);
+        const to = new Date(document.getElementById('date-to').value);
+
+        let companyData = MOCK_DATA.ads;
+        if (selectedCompany !== 'all') {
+            const dataCompanyId = normalizeCompanyForData(selectedCompany);
+            companyData = dataCompanyId
+              ? MOCK_DATA.ads.filter(ad => ad.companyId === dataCompanyId)
+              : [];
+        }
+
+        if (isNaN(from) || isNaN(to)) return companyData;
+
+        const inclusiveTo = new Date(to);
+        inclusiveTo.setDate(inclusiveTo.getDate() + 1);
+
+        let filtered = companyData.filter(d => {
+            const itemDate = new Date(d.date);
+            return itemDate >= from && itemDate < inclusiveTo;
+        });
+
+        if (cityFilter) {
+          filtered = filtered.filter(d => d.city === cityFilter);
+        }
+
+        return filtered;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        populateCompanySelector();
+
+        const dateFromInput = document.getElementById('date-from');
+        const dateToInput = document.getElementById('date-to');
+        
+        const lastDate = new Date(Math.max(...MOCK_DATA.ads.map(e => new Date(e.date))));
+        const firstDate = new Date(Math.min(...MOCK_DATA.ads.map(e => new Date(e.date))));
+
+        dateToInput.value = lastDate.toISOString().split('T')[0];
+        dateFromInput.value = firstDate.toISOString().split('T')[0];
+
+        document.getElementById('update-button').addEventListener('click', updateDashboard);
+
+        // Автонастройка из URL
+        const { q, company, city, days } = getURLParams();
+        const selector = document.getElementById('company-selector');
+        if (company) {
+          selector.value = company; // seltka | iltech | mituroom | all
+        }
+        if (city) {
+          cityFilter = city;
+        }
+        if (days) {
+          const d = parseInt(days, 10);
+          if (!isNaN(d) && d > 0) {
+            const toDate = new Date(dateToInput.value);
+            const fromDate = new Date(toDate);
+            fromDate.setDate(toDate.getDate() - d + 1);
+            dateFromInput.value = fromDate.toISOString().split('T')[0];
+          }
+        }
+        // Быстрый парсер q для популярных кейсов
+        if (q) {
+          const lower = q.toLowerCase();
+          if (lower.includes('сэлтка')) selector.value = 'seltka';
+          if (lower.includes('iltech') || lower.includes('ильтех')) selector.value = 'iltech';
+          if (lower.includes('mituroom')) selector.value = 'mituroom';
+          if (lower.includes('казани') || lower.includes('казань')) cityFilter = 'Казань';
+          if (lower.includes('7') && lower.includes('дн')) {
+            const toDate = new Date(dateToInput.value);
+            const fromDate = new Date(toDate);
+            fromDate.setDate(toDate.getDate() - 7 + 1);
+            dateFromInput.value = fromDate.toISOString().split('T')[0];
+          }
+          if (lower.includes('месяц')) {
+            const toDate = new Date(dateToInput.value);
+            const fromDate = new Date(toDate);
+            fromDate.setDate(toDate.getDate() - 30 + 1);
+            dateFromInput.value = fromDate.toISOString().split('T')[0];
+          }
+        }
+
+        updateDashboard();
+    });
+
+    function updateDashboard() {
+        const filteredData = getFilteredData();
+        updateKPIs(filteredData);
+        updateCityChart(filteredData);
+        updateStrategyChart(filteredData);
+        updateTimeChart(filteredData);
+        renderTable(filteredData);
+    }
+    
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
+    }
+
+    function updateKPIs(data) {
+        const totalCost = data.reduce((sum, item) => sum + item.cost, 0);
+        const totalContacts = data.reduce((sum, item) => sum + item.contacts, 0);
+        const totalImpressions = data.reduce((sum, item) => sum + item.impressions, 0);
+        const costPerContact = totalContacts > 0 ? totalCost / totalContacts : 0;
+
+        const kpis = [
+            { label: 'Общие Затраты', value: formatCurrency(totalCost) },
+            { label: 'Всего Контактов', value: totalContacts.toLocaleString('ru-RU') },
+            { label: 'Стоимость Контакта', value: formatCurrency(costPerContact) },
+            { label: 'Всего Показов', value: totalImpressions.toLocaleString('ru-RU') }
+        ];
+
+        const grid = document.getElementById('kpi-grid');
+        grid.innerHTML = kpis.map(kpi => `
+            <div class="kpi-card">
+                <p class="text-gray-500 text-md font-medium">${kpi.label}</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2">${kpi.value}</p>
+            </div>
+        `).join('');
+    }
+    
+    function updateCityChart(data) {
+        const cityData = data.reduce((acc, item) => {
+            if (!acc[item.city]) acc[item.city] = { contacts: 0, cost: 0 };
+            acc[item.city].contacts += item.contacts;
+            acc[item.city].cost += item.cost;
+            return acc;
+        }, {});
+        
+        const sortedCities = Object.entries(cityData).sort((a, b) => a[1].contacts - b[1].contacts);
+        const labels = sortedCities.map(c => c[0]);
+        const contacts = sortedCities.map(c => c[1].contacts);
+
+        if (charts.city) charts.city.destroy();
+        charts.city = new Chart(document.getElementById('cityChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Контакты',
+                    data: contacts,
+                    backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    }
+
+    function updateStrategyChart(data) {
+        const strategyData = data.reduce((acc, item) => {
+            if (!acc[item.strategy]) acc[item.strategy] = 0;
+            acc[item.strategy] += item.contacts;
+            return acc;
+        }, {});
+        
+        const labels = Object.keys(strategyData);
+        const contacts = Object.values(strategyData);
+        
+        if (charts.strategy) charts.strategy.destroy();
+        charts.strategy = new Chart(document.getElementById('strategyChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Контакты',
+                    data: contacts,
+                    backgroundColor: ['rgba(79, 70, 229, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)'],
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    function updateTimeChart(data) {
+        const timeData = data.reduce((acc, item) => {
+            if (!acc[item.date]) acc[item.date] = { contacts: 0, cost: 0 };
+            acc[item.date].contacts += item.contacts;
+            acc[item.date].cost += item.cost;
+            return acc;
+        }, {});
+
+        const sortedDates = Object.entries(timeData).sort((a,b) => new Date(a[0]) - new Date(b[0]));
+        const labels = sortedDates.map(d => d[0]);
+        const contacts = sortedDates.map(d => d[1].contacts);
+        const cost = sortedDates.map(d => d[1].cost);
+
+        if (charts.time) charts.time.destroy();
+        charts.time = new Chart(document.getElementById('timeChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'Контакты', data: contacts, borderColor: 'rgb(79, 70, 229)', backgroundColor: 'rgba(79, 70, 229, 0.1)', yAxisID: 'yContacts', tension: 0.1, fill: true },
+                    { label: 'Затраты (₽)', data: cost, borderColor: 'rgb(249, 115, 22)', backgroundColor: 'rgba(249, 115, 22, 0.1)', yAxisID: 'yCost', tension: 0.1 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'time', time: { unit: 'day' } }, yContacts: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Контакты' } }, yCost: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Затраты (₽)' }, grid: { drawOnChartArea: false } } } }
+        });
+    }
+    
+    function renderTable(data) {
+        const headers = [
+            { key: 'title', label: 'Название Объявления' }, { key: 'city', label: 'Город' }, { key: 'contacts', label: 'Контакты' }, { key: 'views', label: 'Просмотры' }, { key: 'impressions', label: 'Показы' }, { key: 'cost', label: 'Затраты (₽)' }, { key: 'cost_per_contact', label: 'CPL (₽)' }
+        ];
+
+        document.getElementById('table-header').innerHTML = headers.map(h => 
+            `<th data-sort-key="${h.key}" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ${h.label} <span class="sort-arrow"></span>
+            </th>`
+        ).join('');
+
+        const enrichedData = data.map(ad => ({ ...ad, cost_per_contact: ad.contacts > 0 ? (ad.cost / ad.contacts) : Infinity }));
+        
+        const sortedData = [...enrichedData].sort((a, b) => {
+            const valA = a[currentSort.key] || 0;
+            const valB = b[currentSort.key] || 0;
+            if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        document.getElementById('ads-table-body').innerHTML = sortedData.map(ad => `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${ad.title}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${ad.city}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${ad.contacts}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${ad.views}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${ad.impressions}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(ad.cost)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">${ad.cost_per_contact !== Infinity ? formatCurrency(ad.cost_per_contact) : 'N/A'}</td>
+            </tr>
+        `).join('');
+
+        document.querySelectorAll('#table-header th').forEach(th => {
+            const key = th.dataset.sortKey;
+            const arrow = th.querySelector('.sort-arrow');
+            if (key === currentSort.key) {
+                arrow.textContent = currentSort.direction === 'asc' ? ' ▲' : ' ▼';
+            } else {
+                arrow.textContent = '';
+            }
+
+            th.addEventListener('click', () => {
+                const key = th.dataset.sortKey;
+                if (currentSort.key === key) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.key = key;
+                    currentSort.direction = 'desc';
+                }
+                renderTable(data);
+            });
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,98 +1,66 @@
-export const dynamic = 'force-dynamic';
+"use client";
 
-interface AnalyticsSummary {
-  data_type: string;
-  record_count: number;
-  description: string;
+import React, { useEffect, useState } from 'react';
+import { rpcPreferV1 } from '@/lib/rpc';
+
+interface AnalyticsSummaryV1 {
+  total_ads: number;
+  total_cities: number;
+  total_contacts: number;
+  avg_conversion: number;
+  refreshed_at: string | null;
 }
 
-interface CityPerformance {
+interface CityPerformanceV1 {
   city: string;
-  ads_count: number;
-  avg_bid: number;
+  impressions: number;
+  views: number;
+  contacts: number;
+  view_to_contact: number;
 }
 
-interface StrategyData {
+interface StrategyMonitoringV1 {
   strategy_type: string;
   ads_count: number;
-  cities_count: number;
+  avg_cost_per_contact: number;
+  avg_conversion: number;
 }
 
-async function fetchAnalyticsSummary(): Promise<AnalyticsSummary[]> {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/get_analytics_summary`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Prefer': 'count=none'
+export default function AnalyticsGuidePage() {
+  const [summary, setSummary] = useState<AnalyticsSummaryV1[] | null>(null);
+  const [cityData, setCityData] = useState<CityPerformanceV1[] | null>(null);
+  const [strategyData, setStrategyData] = useState<StrategyMonitoringV1[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const [s, c, sm] = await Promise.all([
+          rpcPreferV1<AnalyticsSummaryV1[]>('get_analytics_summary'),
+          rpcPreferV1<CityPerformanceV1[]>('get_city_performance', { p_limit: 20 }),
+          rpcPreferV1<StrategyMonitoringV1[]>('get_strategy_monitoring', { p_limit: 50 })
+        ]);
+        if (!mounted) return;
+        setSummary(s);
+        setCityData(c);
+        setStrategyData(sm);
+      } catch (e: any) {
+        console.error('AnalyticsGuide load error:', e);
+        if (!mounted) return;
+        setError(String(e?.message || e));
+        // set safe fallbacks to avoid empty UI
+        setSummary([]);
+        setCityData([]);
+        setStrategyData([]);
       }
-    });
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching analytics summary:', error);
-    return [];
-  }
-}
-
-async function fetchCityPerformance(): Promise<CityPerformance[]> {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/get_city_performance`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Prefer': 'count=none'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching city performance:', error);
-    return [];
-  }
-}
-
-async function fetchStrategyData(): Promise<StrategyData[]> {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/get_strategy_monitoring`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Prefer': 'count=none'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching strategy data:', error);
-    return [];
-  }
-}
-
-export default async function AnalyticsGuidePage() {
-  const [summary, cityData, strategyData] = await Promise.all([
-    fetchAnalyticsSummary(),
-    fetchCityPerformance(),
-    fetchStrategyData()
-  ]);
+  const isLoading = summary === null || cityData === null || strategyData === null;
 
   return (
     <main style={{ padding: 24, fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
@@ -143,27 +111,45 @@ export default async function AnalyticsGuidePage() {
       <section style={{ marginBottom: 40 }}>
         <h2 style={{ color: '#17a2b8', marginBottom: 20 }}>📊 ТЕКУЩЕЕ СОСТОЯНИЕ СИСТЕМЫ</h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16, marginBottom: 24 }}>
-          {summary.map((item, index) => (
-            <div key={index} style={{
-              padding: 20,
-              backgroundColor: '#e7f3ff',
-              borderRadius: 8,
-              border: '1px solid #b8daff',
-              textAlign: 'center'
-            }}>
-              <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#0056b3', marginBottom: 8 }}>
-                {item.record_count}
-              </div>
-              <div style={{ fontSize: '16px', fontWeight: '600', color: '#0056b3', marginBottom: 4 }}>
-                {item.data_type}
-              </div>
-              <div style={{ fontSize: '14px', color: '#6c757d' }}>
-                {item.description}
-              </div>
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div style={{ color: '#6c757d' }}>Загрузка сводной информации…</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16, marginBottom: 24 }}>
+            {summary && summary.length > 0 ? (
+              <>
+                <div style={{ padding: 20, backgroundColor: '#e7f3ff', borderRadius: 8, border: '1px solid #b8daff', textAlign: 'center' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#0056b3', marginBottom: 8 }}>
+                    {summary[0].total_ads}
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#0056b3' }}>Объявлений</div>
+                </div>
+                <div style={{ padding: 20, backgroundColor: '#e7f3ff', borderRadius: 8, border: '1px solid #b8daff', textAlign: 'center' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#0056b3', marginBottom: 8 }}>
+                    {summary[0].total_cities}
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#0056b3' }}>Городов</div>
+                </div>
+                <div style={{ padding: 20, backgroundColor: '#e7f3ff', borderRadius: 8, border: '1px solid #b8daff', textAlign: 'center' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#0056b3', marginBottom: 8 }}>
+                    {summary[0].total_contacts}
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#0056b3' }}>Контактов</div>
+                </div>
+                <div style={{ padding: 20, backgroundColor: '#e7f3ff', borderRadius: 8, border: '1px solid #b8daff', textAlign: 'center' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#0056b3', marginBottom: 8 }}>
+                    {Number(summary[0].avg_conversion ?? 0).toFixed(2)}%
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#0056b3' }}>Конверсия</div>
+                </div>
+              </>
+            ) : (
+              <div style={{ color: '#6c757d' }}>Нет данных сводки</div>
+            )}
+          </div>
+        )}
+        {error && (
+          <div style={{ color: '#dc3545', fontSize: 14, marginTop: 8 }}>Ошибка загрузки: {error}</div>
+        )}
       </section>
 
       {/* How to Start Working */}
@@ -200,7 +186,12 @@ export default async function AnalyticsGuidePage() {
       </section>
 
       {/* City Performance Table */}
-      {cityData.length > 0 && (
+      {isLoading ? (
+        <section style={{ marginBottom: 40 }}>
+          <h2 style={{ color: '#6f42c1', marginBottom: 20 }}>🏙️ АНАЛИЗ ПО ГОРОДАМ</h2>
+          <div style={{ color: '#6c757d' }}>Загрузка таблицы по городам…</div>
+        </section>
+      ) : (cityData && cityData.length > 0 && (
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: '#6f42c1', marginBottom: 20 }}>🏙️ АНАЛИЗ ПО ГОРОДАМ</h2>
           <div style={{
@@ -213,26 +204,35 @@ export default async function AnalyticsGuidePage() {
               <thead style={{ backgroundColor: '#f8f9fa' }}>
                 <tr>
                   <th style={{ padding: 16, textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>Город</th>
-                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Объявлений</th>
-                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Средняя ставка</th>
+                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Показы</th>
+                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Просмотры</th>
+                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Контакты</th>
+                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Просм→контакт</th>
                 </tr>
               </thead>
               <tbody>
                 {cityData.map((city, index) => (
                   <tr key={index} style={{ borderBottom: '1px solid #f1f3f4' }}>
                     <td style={{ padding: 16, fontWeight: '600' }}>{city.city}</td>
-                    <td style={{ padding: 16, textAlign: 'center' }}>{city.ads_count}</td>
-                    <td style={{ padding: 16, textAlign: 'center' }}>{city.avg_bid} ₽</td>
+                    <td style={{ padding: 16, textAlign: 'center' }}>{city.impressions}</td>
+                    <td style={{ padding: 16, textAlign: 'center' }}>{city.views}</td>
+                    <td style={{ padding: 16, textAlign: 'center' }}>{city.contacts}</td>
+                    <td style={{ padding: 16, textAlign: 'center' }}>{Number(city.view_to_contact ?? 0).toFixed(2)}%</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </section>
-      )}
+      ))}
 
       {/* Strategy Monitoring */}
-      {strategyData.length > 0 && (
+      {isLoading ? (
+        <section style={{ marginBottom: 40 }}>
+          <h2 style={{ color: '#fd7e14', marginBottom: 20 }}>🎯 МОНИТОРИНГ СТРАТЕГИЙ</h2>
+          <div style={{ color: '#6c757d' }}>Загрузка мониторинга стратегий…</div>
+        </section>
+      ) : (strategyData && strategyData.length > 0 && (
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: '#fd7e14', marginBottom: 20 }}>🎯 МОНИТОРИНГ СТРАТЕГИЙ</h2>
           <div style={{
@@ -246,7 +246,8 @@ export default async function AnalyticsGuidePage() {
                 <tr>
                   <th style={{ padding: 16, textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>Стратегия</th>
                   <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Объявлений</th>
-                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Городов</th>
+                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Средняя цена контакта</th>
+                  <th style={{ padding: 16, textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>Конверсия</th>
                 </tr>
               </thead>
               <tbody>
@@ -254,14 +255,15 @@ export default async function AnalyticsGuidePage() {
                   <tr key={index} style={{ borderBottom: '1px solid #f1f3f4' }}>
                     <td style={{ padding: 16, fontWeight: '600' }}>{strategy.strategy_type}</td>
                     <td style={{ padding: 16, textAlign: 'center' }}>{strategy.ads_count}</td>
-                    <td style={{ padding: 16, textAlign: 'center' }}>{strategy.cities_count}</td>
+                    <td style={{ padding: 16, textAlign: 'center' }}>{Number(strategy.avg_cost_per_contact ?? 0).toFixed(0)} ₽</td>
+                    <td style={{ padding: 16, textAlign: 'center' }}>{Number(strategy.avg_conversion ?? 0).toFixed(2)}%</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </section>
-      )}
+      ))}
 
       {/* Recommendations */}
       <section style={{ marginBottom: 40 }}>

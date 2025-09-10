@@ -1,25 +1,7 @@
-export const dynamic = 'force-dynamic';
+"use client";
 
-async function rpc<T>(fn: string, body?: any): Promise<T> {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/${fn}`;
-  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'apikey': apikey,
-      'Authorization': `Bearer ${apikey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'count=none',
-    },
-    body: body ? JSON.stringify(body) : '{}',
-    next: { revalidate: 0 },
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`RPC ${fn} failed: ${res.status} ${text}`);
-  }
-  return res.json();
-}
+import React, { useEffect, useState } from 'react';
+import { rpcPreferV1 } from '@/lib/rpc';
 
 type BidsSummary = {
   total_bids: number;
@@ -38,22 +20,44 @@ type PositionAnalysis = {
   success_rate: number;
 };
 
-export default async function AvitoBidsDashboardPage() {
-  let bidsSummary: BidsSummary[] = [];
-  let positionsAnalysis: PositionAnalysis[] = [];
+export default function AvitoBidsDashboardPage() {
+  const [bidsSummary, setBidsSummary] = useState<BidsSummary[] | null>(null);
+  const [positionsAnalysis, setPositionsAnalysis] = useState<PositionAnalysis[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [company, setCompany] = useState<string>('all');
 
-  try {
-    bidsSummary = await rpc<BidsSummary[]>('get_avito_bids_summary');
-  } catch (e: any) {
-    console.error('Error fetching bids summary:', e);
-  }
+  // Варианты компаний: бизнес-именование → отображаемое имя/ответственный
+  const companies = [
+    { value: 'all', label: 'Все компании' },
+    { value: 'seltka', label: 'Сэлтка (Кирилл)' },
+    { value: 'iltech', label: 'Ильтех (Ильнур)' },
+    { value: 'mituroom', label: 'mituroom (Артем)' },
+  ];
 
-  try {
-    positionsAnalysis = await rpc<PositionAnalysis[]>('get_avito_positions_analysis');
-  } catch (e: any) {
-    console.error('Error fetching positions analysis:', e);
-  }
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const payload = company === 'all' ? undefined : { p_company: company } as any;
+        const [s, p] = await Promise.all([
+          rpcPreferV1<BidsSummary[]>('get_avito_bids_summary', payload),
+          rpcPreferV1<PositionAnalysis[]>('get_avito_positions_analysis', payload)
+        ]);
+        if (!mounted) return;
+        setBidsSummary(s);
+        setPositionsAnalysis(p);
+      } catch (e: any) {
+        console.error('Avito Bids load error:', e);
+        if (!mounted) return;
+        setError(String(e?.message || e));
+        setBidsSummary([]);
+        setPositionsAnalysis([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [company]);
 
+  const isLoading = bidsSummary === null || positionsAnalysis === null;
   const s = bidsSummary?.[0];
 
   return (
@@ -63,11 +67,32 @@ export default async function AvitoBidsDashboardPage() {
         <p style={{ fontSize: '16px', color: '#6c757d', marginBottom: 24 }}>
           Анализ 14,000+ собранных ставок | IT отдел CRM
         </p>
-        {s && (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+          <label htmlFor="company" style={{ fontSize: 14, color: '#444' }}>Компания:</label>
+          <select
+            id="company"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            style={{ padding: '6px 10px', border: '1px solid #e1e1e1', borderRadius: 6 }}
+          >
+            {companies.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+        {!isLoading && s && (
           <div style={{ padding: 16, backgroundColor: '#e7f3ff', borderRadius: 8, border: '1px solid #b8daff' }}>
             <p style={{ margin: 0, fontSize: '14px', color: '#0056b3' }}>
               📊 <strong>Последнее обновление:</strong> {new Date(s.last_updated).toLocaleString('ru-RU')}
             </p>
+          </div>
+        )}
+        {isLoading && (
+          <div style={{ padding: 16, color: '#6c757d' }}>Загрузка данных…</div>
+        )}
+        {error && (
+          <div style={{ padding: 16, color: '#721c24', background: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: 8, marginTop: 12 }}>
+            Ошибка загрузки: {error}
           </div>
         )}
       </div>
@@ -199,7 +224,7 @@ export default async function AvitoBidsDashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {positionsAnalysis.length === 0 ? (
+              {!positionsAnalysis || positionsAnalysis.length === 0 ? (
                 <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: '#888' }}>Нет данных по позициям</td></tr>
               ) : positionsAnalysis.map((pos, index) => (
                 <tr key={index} style={{

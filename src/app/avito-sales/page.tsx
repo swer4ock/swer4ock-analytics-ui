@@ -1,25 +1,7 @@
-export const dynamic = 'force-dynamic';
+"use client";
 
-async function rpc<T>(fn: string, body?: any): Promise<T> {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/${fn}`;
-  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'apikey': apikey,
-      'Authorization': `Bearer ${apikey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'count=none',
-    },
-    body: body ? JSON.stringify(body) : '{}',
-    next: { revalidate: 0 },
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`RPC ${fn} failed: ${res.status} ${text}`);
-  }
-  return res.json();
-}
+import React, { useEffect, useState } from 'react';
+import { rpcPreferV1 } from '@/lib/rpc';
 
 type SalesSummary = {
   total_ads: number;
@@ -56,36 +38,51 @@ type SalesTrend = {
   avg_conversion: number;
 };
 
-export default async function AvitoSalesDashboardPage() {
-  let summary: SalesSummary[] = [];
-  let cities: CitySales[] = [];
-  let categories: CategoryPerformance[] = [];
-  let trends: SalesTrend[] = [];
+export default function AvitoSalesDashboardPage() {
+  const [summary, setSummary] = useState<SalesSummary[] | null>(null);
+  const [cities, setCities] = useState<CitySales[] | null>(null);
+  const [categories, setCategories] = useState<CategoryPerformance[] | null>(null);
+  const [trends, setTrends] = useState<SalesTrend[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [company, setCompany] = useState<string>('all');
 
-  try {
-    summary = await rpc<SalesSummary[]>('get_avito_sales_summary');
-  } catch (e: any) {
-    console.error('Error fetching sales summary:', e);
-  }
+  const companies = [
+    { value: 'all', label: 'Все компании' },
+    { value: 'seltka', label: 'Сэлтка (Кирилл)' },
+    { value: 'iltech', label: 'Ильтех (Ильнур)' },
+    { value: 'mituroom', label: 'mituroom (Артем)' },
+  ];
 
-  try {
-    cities = await rpc<CitySales[]>('get_avito_top_cities_sales', { p_limit: 10 });
-  } catch (e: any) {
-    console.error('Error fetching cities sales:', e);
-  }
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const payloadBase = company === 'all' ? {} : { p_company: company } as any;
+        const [s, c, cats, t] = await Promise.all([
+          rpcPreferV1<SalesSummary[]>('get_avito_sales_summary', Object.keys(payloadBase).length ? payloadBase : undefined),
+          rpcPreferV1<CitySales[]>('get_avito_top_cities_sales', { p_limit: 10, ...payloadBase }),
+          rpcPreferV1<CategoryPerformance[]>('get_avito_categories_performance', { p_limit: 10, ...payloadBase }),
+          rpcPreferV1<SalesTrend[]>('get_avito_sales_trends', { p_days: 7, ...payloadBase })
+        ]);
+        if (!mounted) return;
+        setSummary(s);
+        setCities(c);
+        setCategories(cats);
+        setTrends(t);
+      } catch (e: any) {
+        console.error('Avito Sales load error:', e);
+        if (!mounted) return;
+        setError(String(e?.message || e));
+        setSummary([]);
+        setCities([]);
+        setCategories([]);
+        setTrends([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [company]);
 
-  try {
-    categories = await rpc<CategoryPerformance[]>('get_avito_categories_performance', { p_limit: 10 });
-  } catch (e: any) {
-    console.error('Error fetching categories performance:', e);
-  }
-
-  try {
-    trends = await rpc<SalesTrend[]>('get_avito_sales_trends', { p_days: 7 });
-  } catch (e: any) {
-    console.error('Error fetching sales trends:', e);
-  }
-
+  const isLoading = summary === null || cities === null || categories === null || trends === null;
   const s = summary?.[0];
 
   return (
@@ -95,6 +92,27 @@ export default async function AvitoSalesDashboardPage() {
         <p style={{ fontSize: '16px', color: '#6c757d', marginBottom: 24 }}>
           Аналитическая панель продаж Avito | IT отдел CRM
         </p>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+          <label htmlFor="company" style={{ fontSize: 14, color: '#444' }}>Компания:</label>
+          <select
+            id="company"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            style={{ padding: '6px 10px', border: '1px solid #e1e1e1', borderRadius: 6 }}
+          >
+            {companies.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+        {isLoading && (
+          <div style={{ padding: 16, color: '#6c757d' }}>Загрузка данных…</div>
+        )}
+        {error && (
+          <div style={{ padding: 16, color: '#721c24', background: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: 8 }}>
+            Ошибка загрузки: {error}
+          </div>
+        )}
       </div>
 
       {/* Executive Summary */}
@@ -226,7 +244,7 @@ export default async function AvitoSalesDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {cities.length === 0 ? (
+                {!cities || cities.length === 0 ? (
                   <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: '#888' }}>Нет данных</td></tr>
                 ) : cities.map((city, index) => (
                   <tr key={index} style={{
@@ -284,7 +302,7 @@ export default async function AvitoSalesDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {categories.length === 0 ? (
+                {!categories || categories.length === 0 ? (
                   <tr><td colSpan={4} style={{ padding: 32, textAlign: 'center', color: '#888' }}>Нет данных</td></tr>
                 ) : categories.map((cat, index) => (
                   <tr key={index} style={{
@@ -322,7 +340,7 @@ export default async function AvitoSalesDashboardPage() {
       </div>
 
       {/* Sales Trends */}
-      {trends.length > 0 && (
+      {trends && trends.length > 0 && (
         <section style={{ marginBottom: 32 }}>
           <h2 style={{ color: '#20c997', marginBottom: 20 }}>📈 Тренды продаж (последние 7 дней)</h2>
           <div style={{
@@ -385,13 +403,13 @@ export default async function AvitoSalesDashboardPage() {
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
           <span style={{ padding: '6px 12px', backgroundColor: '#34495e', borderRadius: 16, fontSize: '12px' }}>
-            📊 {cities.length} городов
+            📊 {(cities?.length ?? 0)} городов
           </span>
           <span style={{ padding: '6px 12px', backgroundColor: '#34495e', borderRadius: 16, fontSize: '12px' }}>
-            📂 {categories.length} категорий
+            📂 {(categories?.length ?? 0)} категорий
           </span>
           <span style={{ padding: '6px 12px', backgroundColor: '#34495e', borderRadius: 16, fontSize: '12px' }}>
-            📈 {trends.length} дней трендов
+            📈 {(trends?.length ?? 0)} дней трендов
           </span>
           <span style={{ padding: '6px 12px', backgroundColor: '#34495e', borderRadius: 16, fontSize: '12px' }}>
             ⚡ Real-time данные

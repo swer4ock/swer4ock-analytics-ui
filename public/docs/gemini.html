@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная Карта Системы v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #212529; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .chart-container { position: relative; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        .ai-chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 400px; max-height: 450px; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .nav-item.active { background-color: #e0e7ff; color: #4f46e5; font-weight: 600; }
+        .schema-card, .ai-card { transition: all 0.2s ease-in-out; }
+        .schema-card:hover, .ai-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <nav class="w-full md:w-72 bg-white border-r border-gray-200 p-4 shrink-0">
+            <h2 class="text-xl font-bold mb-6 text-gray-800">🏢 Операционные Юниты</h2>
+            <ul id="department-nav" class="space-y-2"></ul>
+        </nav>
+
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+            <header class="mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Интерактивная Карта Системы</h1>
+                <p class="text-gray-600 mt-2">Единая операционная среда для AI-агентов и сотрудников. Выберите юнит для просмотра его функций и связей с данными.</p>
+            </header>
+            
+            <section id="overview-section" class="mb-8">
+                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Обзор Архитектуры Данных</h2>
+                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <p class="text-gray-600 mb-4">На диаграмме показано количество таблиц и представлений в каждой схеме данных. Это дает общее представление о масштабе и сложности различных модулей системы. При выборе юнита, связанные с ним схемы будут подсвечены.</p>
+                    <div class="chart-container">
+                        <canvas id="schemaChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-display"></section>
+        </main>
+    </div>
+
+<script>
+const dbData = {
+    departments: [
+        { id: 'ai', name: '🤖 ЦЕНТР УПРАВЛЕНИЯ AI (Vertex AI)', description: 'Центральное ядро для оркестрации, обучения и выполнения AI-агентов. Интегрируется со всеми отделами для автоматизации и аналитики.', relatedSchemas: ['analytics', 'auth', 'core', 'marketplace', 'public', 'sales', 'storage', 'extensions', 'geography', 'realtime', 'supabase_migrations', 'vault'] },
+        { id: 'it', name: '1️⃣ ИТ-ОТДЕЛ', description: 'Ответственность: Качество разработки, автоматизация, инфраструктура.', relatedSchemas: ['core', 'auth', 'extensions', 'storage', 'vault', 'supabase_migrations', 'realtime'] },
+        { id: 'sales', name: '2️⃣ ОТДЕЛ ПРОДАЖ (CRM/SALES)', description: 'Ответственность: Управление клиентами и сделками.', relatedSchemas: ['sales', 'core', 'public'] },
+        { id: 'product', name: '3️⃣ ПРОДУКТОВЫЙ ОТДЕЛ (КАТАЛОГ)', description: 'Ответственность: Управление товарами и запасами.', relatedSchemas: ['sales', 'core'] },
+        { id: 'analytics', name: '4️⃣ АНАЛИТИЧЕСКИЙ ОТДЕЛ', description: 'Ответственность: Бизнес-аналитика и отчетность.', relatedSchemas: ['analytics', 'public', 'sales'] },
+        { id: 'integrations', name: '5️⃣ ОТДЕЛ ИНТЕГРАЦИЙ (MARKETPLACES)', description: 'Ответственность: Синхронизация с внешними платформами.', relatedSchemas: ['marketplace', 'core', 'public'] },
+        { id: 'finance', name: '6️⃣ ФИНАНСОВЫЙ ОТДЕЛ', description: 'Ответственность: Финансовый учет и анализ.', relatedSchemas: ['public', 'sales', 'core'] }
+    ],
+    schemas: {
+        analytics: { name: 'analytics - Аналитика', tables: ['data_assets', 'data_requests', 'error_logs'], views: ['v_autobidder_dashboard', 'v_avito_performance_summary', 'v_bidder_ad_performance', 'v_bidder_city_performance', 'v_bidder_strategy_monitoring', 'v_bidder_summary', 'v_cities_near_kazan', 'v_data_requests_queue', 'v_error_dashboard', 'v_performance_near_kazan', 'v_price_trends', 'v_product_kpis', 'v_ready_assets', 'v_stock_turnover'] },
+        auth: { name: 'auth - Аутентификация', tables: ['audit_log_entries', 'flow_state', 'identities', 'instances', 'mfa_amr_claims', 'mfa_challenges', 'mfa_factors', 'oauth_clients', 'one_time_tokens', 'refresh_tokens', 'saml_providers', 'saml_relay_states', 'schema_migrations', 'sessions', 'sso_domains', 'sso_providers', 'users'], views: [] },
+        core: { name: 'core - Ядро системы', tables: ['ads_platforms', 'agent_limits', 'ai_policies', 'business_rules', 'calendar_reference', 'change_reasons', 'cities', 'currencies', 'customer_types', 'customers', 'default_task_checks', 'financial_metrics', 'geography_cities', 'idempotency_keys', 'product_categories', 'quarantine', 'queues', 'task_checks'], views: ['v_ai_task_queue'] },
+        marketplace: { name: 'marketplace - Маркетплейсы', tables: ['marketplaces', 'mcp_configs', 'product_mappings', 'sync_logs', 'xlsx_imports'], views: [] },
+        public: { name: 'public - Общие данные', tables: ['ai_agent_instructions', 'ai_events', 'analytics_requests', 'avito_ad_statistics', 'avito_bidder_ads', 'avito_bidder_city_strategies', 'avito_bidder_metadata', 'avito_bidder_settings', 'avito_complete_bids_analysis', 'avito_current_bids', 'companies', 'contact_identities', 'contacts', 'database_documentation', 'deal_tasks', 'deals', 'doc_simple', 'finance_metrics', 'idea_pool', 'interactions', 'interactions_staging', 'project_files_documentation', 'teams', 'tenant_users', 'tenants', 'ws_artifacts', 'ws_checks', 'ws_runs', 'ws_tasks'], views: ['v_finance_by_client_month', 'v_finance_daily', 'v_marketing_efficiency_analysis', 'v_table_documentation', 'v_tasks_filtered'] },
+        sales: { name: 'sales - Продажи и Склад', tables: ['ads_metrics_daily', 'avito_file_manifest', 'avito_metrics_daily', 'avito_raw_metrics', 'price_history', 'product_meta', 'products', 'sales_items_daily', 'stock_history', 'stock_levels', 'warehouses'], views: ['v_ads_by_platform', 'v_ads_pulse', 'v_ads_romi', 'v_avito_analytics', 'v_avito_crm_pulse', 'v_low_stock', 'v_products_with_stock', 'v_romi_daily', 'v_stock_by_location'] },
+        storage: { name: 'storage - Хранилище', tables: ['buckets', 'buckets_analytics', 'migrations', 'objects', 'prefixes', 's3_multipart_uploads', 's3_multipart_uploads_parts'], views: [] },
+        extensions: { name: 'extensions - Расширения', tables: ['spatial_ref_sys'], views: [] },
+        geography: { name: 'geography - География', tables: ['city_coordinates'], views: [] },
+        realtime: { name: 'realtime - Real-time', tables: ['messages', 'schema_migrations', 'subscription'], views: [] },
+        supabase_migrations: { name: 'supabase_migrations - Миграции', tables: ['schema_migrations'], views: [] },
+        vault: { name: 'vault - Безопасность', tables: ['secrets'], views: [] }
+    }
+};
+
+let schemaChart = null;
+let aiImpactChart = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navContainer = document.getElementById('department-nav');
+    dbData.departments.forEach((dept, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#" data-dept-id="${dept.id}" class="nav-item block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">${dept.name}</a>`;
+        navContainer.appendChild(li);
+        if(index === 0) {
+            const hr = document.createElement('hr');
+            hr.className = "my-4";
+            navContainer.appendChild(hr);
+        }
+    });
+
+    navContainer.addEventListener('click', (e) => {
+        e.preventDefault();
+        const link = e.target.closest('a');
+        if (link) {
+            const deptId = link.dataset.deptId;
+            renderDepartmentView(deptId);
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+    
+    document.getElementById('content-display').addEventListener('click', e => {
+        const header = e.target.closest('.accordion-header');
+        if (header) {
+            const content = header.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                header.querySelector('span').textContent = '▼';
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                header.querySelector('span').textContent = '▲';
+            }
+        }
+    });
+    
+    renderSchemaChart();
+    renderDepartmentView('ai');
+    const aiLink = document.querySelector('.nav-item[data-dept-id="ai"]');
+    if (aiLink) aiLink.classList.add('active');
+});
+
+function renderSchemaChart(highlightedSchemas = []) {
+    const ctx = document.getElementById('schemaChart').getContext('2d');
+    const schemaNames = Object.keys(dbData.schemas).map(key => dbData.schemas[key].name.split(' - ')[0]);
+    const schemaData = Object.keys(dbData.schemas).map(key => dbData.schemas[key].tables.length + dbData.schemas[key].views.length);
+    
+    const backgroundColors = Object.keys(dbData.schemas).map(schema => highlightedSchemas.includes(schema) ? 'rgba(79, 70, 229, 0.7)' : 'rgba(209, 213, 219, 0.7)');
+    const borderColors = Object.keys(dbData.schemas).map(schema => highlightedSchemas.includes(schema) ? 'rgba(79, 70, 229, 1)' : 'rgba(156, 163, 175, 1)');
+
+    if (schemaChart) {
+        schemaChart.data.datasets[0].backgroundColor = backgroundColors;
+        schemaChart.data.datasets[0].borderColor = borderColors;
+        schemaChart.update();
+        return;
+    }
+    
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    
+    schemaChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: schemaNames,
+            datasets: [{
+                label: 'Количество объектов (таблиц + представлений)',
+                data: schemaData,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { beginAtZero: true, ticks: { color: '#4b5563' }, grid: { color: '#e5e7eb' } },
+                y: { ticks: { color: '#4b5563' }, grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { backgroundColor: '#1f2937', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 4 }
+            }
+        }
+    });
+}
+
+function renderAiImpactChart() {
+    if (aiImpactChart) {
+        aiImpactChart.destroy();
+    }
+    const ctx = document.getElementById('aiImpactChart').getContext('2d');
+    const labels = ['sales', 'analytics', 'marketplace', 'core', 'public', 'storage'];
+    const data = [10, 9, 8, 7, 8, 5]; 
+    
+    aiImpactChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Потенциал влияния AI',
+                data: data,
+                fill: true,
+                backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                borderColor: 'rgb(79, 70, 229)',
+                pointBackgroundColor: 'rgb(79, 70, 229)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(79, 70, 229)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            elements: { line: { borderWidth: 2 } },
+            scales: { r: { angleLines: { color: '#e5e7eb' }, grid: { color: '#e5e7eb' }, pointLabels: { font: { size: 14, weight: '500' }, color: '#374151' }, ticks: { backdropColor: 'rgba(255, 255, 255, 0.75)', color: '#4b5563' }, suggestedMin: 0, suggestedMax: 10 } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function renderDepartmentView(deptId) {
+    const department = dbData.departments.find(d => d.id === deptId);
+    if (!department) return;
+
+    const contentContainer = document.getElementById('content-display');
+    
+    if (deptId === 'ai') {
+        contentContainer.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">${department.name}</h2>
+                <p class="mt-2 text-gray-600">${department.description}</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Компоненты Платформы Vertex AI</h3>
+                    <div class="space-y-4">
+                        <div class="ai-card bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-bold text-lg text-indigo-700">🧠 Мозг Системы (Gemini 1.5 Pro)</h4>
+                            <p class="text-gray-600 text-sm mt-1">Выполняет интеллектуальную работу: анализ, генерация SQL, написание кода. Является ядром для всех AI-агентов.</p>
+                        </div>
+                        <div class="ai-card bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-bold text-lg text-indigo-700">📚 База Знаний (Grounding & Vector Search)</h4>
+                            <p class="text-gray-600 text-sm mt-1">Обучает агентов на вашей документации (схемы <strong>public, core</strong>), обеспечивая точность и релевантность ответов.</p>
+                        </div>
+                        <div class="ai-card bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-bold text-lg text-indigo-700">🛠️ Инструменты Агентов (Agent Builder)</h4>
+                            <p class="text-gray-600 text-sm mt-1">Позволяет агентам выполнять действия: делать запросы к <strong>sales</strong>, строить отчеты по <strong>analytics</strong>, управлять задачами в <strong>ws_tasks</strong>.</p>
+                        </div>
+                         <div class="ai-card bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-bold text-lg text-indigo-700">⚙️ Оркестратор (Vertex AI Pipelines)</h4>
+                            <p class="text-gray-600 text-sm mt-1">Управляет сложными, многошаговыми процессами, обеспечивая надежность и масштабируемость всей системы.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                     <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Карта Влияния AI на Данные</h3>
+                     <p class="text-gray-600 mb-4 text-sm text-center">Диаграмма показывает потенциал автоматизации и аналитической глубины для ключевых схем данных при внедрении AI-агентов.</p>
+                    <div class="ai-chart-container">
+                        <canvas id="aiImpactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        `;
+        renderAiImpactChart();
+        renderSchemaChart(department.relatedSchemas);
+    } else {
+        let schemaHtml = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+        department.relatedSchemas.forEach(schemaId => {
+            const schema = dbData.schemas[schemaId];
+            if(schema) {
+                schemaHtml += `
+                <div class="schema-card bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="accordion-header cursor-pointer flex justify-between items-center">
+                        <h4 class="text-lg font-semibold text-indigo-700">${schema.name}</h4>
+                        <span class="text-indigo-700">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <h5 class="font-semibold text-gray-700 mb-2">Таблицы (${schema.tables.length}):</h5>
+                            <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                ${schema.tables.map(t => `<li>${t}</li>`).join('') || '<li>Нет таблиц</li>'}
+                            </ul>
+                            <h5 class="font-semibold text-gray-700 mt-4 mb-2">Представления (${schema.views.length}):</h5>
+                            <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                ${schema.views.map(v => `<li>${v}</li>`).join('') || '<li>Нет представлений</li>'}
+                            </ul>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        });
+        schemaHtml += '</div>';
+
+        const html = `
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">${department.name}</h2>
+                <p class="mt-2 text-gray-600">${department.description}</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Ключевые схемы данных</h3>
+                 <p class="text-gray-600 mb-6">Ниже представлены основные схемы, с которыми работает данный отдел. Кликните на название схемы, чтобы развернуть список таблиц и представлений.</p>
+                ${schemaHtml}
+            </div>
+        `;
+        contentContainer.innerHTML = html;
+        if (aiImpactChart) { aiImpactChart.destroy(); aiImpactChart = null; }
+        renderSchemaChart(department.relatedSchemas);
+    }
+    document.getElementById('overview-section').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
