@@ -62,6 +62,8 @@ export default function AdsIntelligencePage() {
   const [geoData, setGeoData] = useState<GeoAnalysis[] | null>(null);
   const [recommendations, setRecommendations] = useState<Recommendation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [totalAdsCount, setTotalAdsCount] = useState<number | null>(null);
+  const [analysisPeriod, setAnalysisPeriod] = useState<string>("Последние 90 дней");
 
   const companies = [
     { value: "seltka" as CompanyCode, label: "Сэлтка (Кирилл)" },
@@ -78,6 +80,7 @@ export default function AdsIntelligencePage() {
         setCategories(null);
         setGeoData(null);
         setRecommendations(null);
+        setTotalAdsCount(null);
 
         const [ads, cats, geo, recs] = await Promise.all([
           rpcPreferV1<AdPerformance[]>("get_unified_ads_performance", { p_company: company, p_limit: 25 }),
@@ -91,6 +94,13 @@ export default function AdsIntelligencePage() {
         setCategories(cats);
         setGeoData(geo);
         setRecommendations(recs);
+        
+        // Calculate total ads count based on available data
+        const totalFromAds = ads?.length || 0;
+        const totalFromCategories = cats?.reduce((sum, cat) => sum + (cat.ads_count || 0), 0) || 0;
+        const totalFromGeo = geo?.reduce((sum, geo) => sum + (geo.ads_count || 0), 0) || 0;
+        const estimatedTotal = Math.max(totalFromAds, totalFromCategories, totalFromGeo, 0);
+        setTotalAdsCount(estimatedTotal);
       } catch (e: any) {
         if (!mounted) return;
         console.error("Ads Intelligence load error:", e);
@@ -99,6 +109,7 @@ export default function AdsIntelligencePage() {
         setCategories([]);
         setGeoData([]);
         setRecommendations([]);
+        setTotalAdsCount(0);
       }
     })();
     return () => { mounted = false; };
@@ -140,6 +151,57 @@ export default function AdsIntelligencePage() {
             {companies.map(c => (<option key={c.value} value={c.value}>{c.label}</option>))}
           </select>
         </div>
+        
+        {/* Analysis Info Block */}
+        {!isLoading && !error && totalAdsCount !== null && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ 
+              padding: 20, 
+              background: '#f8f9fa', 
+              border: '1px solid #e9ecef', 
+              borderRadius: 12, 
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 16
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#28a745', marginBottom: 4 }}>
+                  {totalAdsCount.toLocaleString('ru-RU')}
+                </div>
+                <div style={{ fontSize: 14, color: '#6c757d', fontWeight: 600 }}>
+                  Всего объявлений
+                </div>
+                <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                  В базе данных
+                </div>
+              </div>
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#007bff', marginBottom: 4 }}>
+                  {companies.find(c => c.value === company)?.label || company}
+                </div>
+                <div style={{ fontSize: 14, color: '#6c757d', fontWeight: 600 }}>
+                  Компания
+                </div>
+                <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                  Анализируется сейчас
+                </div>
+              </div>
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#fd7e14', marginBottom: 4 }}>
+                  {analysisPeriod}
+                </div>
+                <div style={{ fontSize: 14, color: '#6c757d', fontWeight: 600 }}>
+                  Период анализа
+                </div>
+                <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                  Временной диапазон
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {isLoading && (
