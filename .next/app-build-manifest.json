@@ -1,3 +1,151 @@
 {
-  "pages": {}
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/_not-found/page-c3d7bfc1806ec87c.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/layout-720d25bfa426ed02.js"
+    ],
+    "/ai-consultant/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/ai-consultant/page-51413774897d4702.js"
+    ],
+    "/ads-intelligence/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/ads-intelligence/page-749529d1f71b6f21.js"
+    ],
+    "/analytics-dashboard/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/analytics-dashboard/page-06628c5255326846.js"
+    ],
+    "/avito-bids/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/avito-bids/page-da489923832dffc3.js"
+    ],
+    "/assets/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/assets/page-5a8c947a0f0448ca.js"
+    ],
+    "/avito-sales/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/avito-sales/page-8b18d77ce246d4ba.js"
+    ],
+    "/analytics-guide/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/analytics-guide/page-82bcabf0b83721ea.js"
+    ],
+    "/it-dashboard/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/it-dashboard/page-f5dabf7ef562fa76.js"
+    ],
+    "/ceo-dashboard/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/ceo-dashboard/page-1216cb34da7ef8fe.js"
+    ],
+    "/instruments/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/instruments/page-7168fda5dcbf6d44.js"
+    ],
+    "/pulse/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/pulse/page-9b4db18ac4c3a4ff.js"
+    ],
+    "/system-map/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/system-map/page-3d8764f5b4a84a26.js"
+    ],
+    "/dashboard/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/dashboard/page-c6b9bf2d4cf880fc.js"
+    ],
+    "/health/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/health/page-cc7c7c4029ffba27.js"
+    ],
+    "/avito-multi/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/avito-multi/page-570fe2775e7c7ca1.js"
+    ],
+    "/analytics/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/analytics/page-18fdbdade2b02bcb.js"
+    ],
+    "/avito-analytics/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/avito-analytics/page-eff44c1d0d031545.js"
+    ],
+    "/avito/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/avito/page-996853620404343d.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-17abec1bd4bca978.js",
+      "static/chunks/fd9d1056-2737f78bfff3f6bf.js",
+      "static/chunks/23-b29ff9681e99b7f6.js",
+      "static/chunks/main-app-4a6a287818c288a6.js",
+      "static/chunks/app/page-48d89aa26feb68e2.js"
+    ]
+  }
 }

@@ -394,6 +394,48 @@ export default async function HomePage() {
             </div>
           </a>
 
+          {/* Avito Analytics */}
+          <a href="/avito" style={{ textDecoration: "none" }}>
+            <div style={{
+              padding: 24,
+              backgroundColor: "#f8f9fa",
+              borderRadius: 16,
+              border: "2px solid #e83e8c",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer",
+              height: "100%"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "#e83e8c",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                  color: "white",
+                  fontSize: "24px"
+                }}>
+                  📊
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                    Avito Аналитика
+                  </h3>
+                  <p style={{ margin: 4, fontSize: "12px", color: "#6c757d" }}>
+                    /avito
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#495057", lineHeight: 1.4, fontSize: "14px" }}>
+                Комплексный анализ объявлений Avito с реальными данными из Supabase.
+              </p>
+            </div>
+          </a>
+
           {/* Instruments */}
           <a href="/instruments" style={{ textDecoration: "none" }}>
             <div style={{
