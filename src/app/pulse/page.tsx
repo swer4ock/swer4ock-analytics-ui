@@ -17,6 +17,14 @@ export default async function PulsePage() {
     pulseData = await rpc<PulseData[]>('get_avito_sales_summary');
   } catch (e: any) {
     console.error('Error fetching pulse data:', e);
+    // Fallback data to prevent page crash
+    pulseData = [{
+      total_views: 0,
+      total_contacts: 0,
+      avg_price: 0,
+      total_ads: 0,
+      last_updated: new Date().toISOString()
+    }];
   }
 
   const data = pulseData?.[0];
