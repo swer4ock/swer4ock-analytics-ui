@@ -1,6 +1,37 @@
+import { rpc } from "../lib/rpc";
+
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+type DevStatus = {
+  total_commits: number;
+  features_added: number;
+  bugs_fixed: number;
+  docs_updated: number;
+  last_commit_date: string;
+  active_tasks: number;
+};
+
+type CommitItem = {
+  commit_hash: string;
+  commit_message: string;
+  author_name: string;
+  commit_date: string;
+  category?: string; // feat|fix|docs|refactor...
+};
+
+export default async function HomePage() {
+  let status: DevStatus | undefined;
+  let commits: CommitItem[] = [];
+  try {
+    const [statusRows, commitRows] = await Promise.all([
+      rpc<DevStatus[]>("get_development_status"),
+      rpc<CommitItem[]>("get_recent_commits", { p_limit: 8 }),
+    ]);
+    status = statusRows?.[0];
+    commits = commitRows ?? [];
+  } catch (e) {
+    console.error("Failed to load IT Hub data:", e);
+  }
   return (
     <main style={{ padding: "24px", maxWidth: 1200, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
       <div style={{ textAlign: "center", marginBottom: 48 }}>
@@ -457,6 +488,90 @@ export default function HomePage() {
               </p>
             </div>
           </a>
+        </div>
+      </section>
+
+      {/* IT Hub Section */}
+      <section style={{ marginBottom: 48 }}>
+        <h2 style={{
+          fontSize: "28px",
+          color: "#20c997",
+          textAlign: "center",
+          marginBottom: 24
+        }}>
+          👥 IT Hub — статус разработки
+        </h2>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 20
+        }}>
+          {/* Dev Status KPIs */}
+          <div style={{
+            padding: 24,
+            backgroundColor: "#f8f9fa",
+            borderRadius: 16,
+            border: "1px solid #e9ecef",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+          }}>
+            <h3 style={{ marginTop: 0, marginBottom: 12, color: "#2c3e50" }}>📈 Статус разработки</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <div style={{ background: '#e7f3ff', border: '1px solid #b8daff', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#6c757d' }}>Коммитов</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#0056b3' }}>{status?.total_commits ?? '—'}</div>
+              </div>
+              <div style={{ background: '#d4edda', border: '1px solid #c3e6cb', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#6c757d' }}>Фич</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#155724' }}>{status?.features_added ?? '—'}</div>
+              </div>
+              <div style={{ background: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#6c757d' }}>Фиксов</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#721c24' }}>{status?.bugs_fixed ?? '—'}</div>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 12 }}>
+              <div style={{ background: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#6c757d' }}>Документация</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#856404' }}>{status?.docs_updated ?? '—'}</div>
+              </div>
+              <div style={{ background: '#f0f2f5', border: '1px solid #e9ecef', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#6c757d' }}>Активных задач</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#2c3e50' }}>{status?.active_tasks ?? '—'}</div>
+              </div>
+              <div style={{ background: '#f0f2f5', border: '1px solid #e9ecef', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#6c757d' }}>Последний коммит</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#2c3e50' }}>{status?.last_commit_date ? new Date(status.last_commit_date).toLocaleString('ru-RU') : '—'}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent commits */}
+          <div style={{
+            padding: 24,
+            backgroundColor: "#f8f9fa",
+            borderRadius: 16,
+            border: "1px solid #e9ecef",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+          }}>
+            <h3 style={{ marginTop: 0, marginBottom: 12, color: "#2c3e50" }}>📝 Последние коммиты</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(commits && commits.length > 0 ? commits : []).slice(0, 8).map((c, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: '#ffffff', border: '1px solid #e9ecef', borderRadius: 8 }}>
+                  <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 999, background: '#e7f3ff', color: '#0056b3', fontWeight: 600 }}>{(c.category ?? 'commit').toUpperCase()}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, color: '#2c3e50', fontWeight: 600, marginBottom: 2 }}>{c.commit_message}</div>
+                    <div style={{ fontSize: 12, color: '#6c757d' }}>{c.author_name} • {new Date(c.commit_date).toLocaleString('ru-RU')}</div>
+                  </div>
+                  <code style={{ fontSize: 11, color: '#6c757d' }}>{c.commit_hash?.slice(0, 7)}</code>
+                </div>
+              ))}
+              {(!commits || commits.length === 0) && (
+                <div style={{ padding: 12, border: '1px dashed #e9ecef', borderRadius: 8, color: '#6c757d', textAlign: 'center' }}>
+                  Нет данных о коммитах
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
