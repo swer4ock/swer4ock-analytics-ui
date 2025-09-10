@@ -166,6 +166,7 @@ export default function AdsIntelligencePage() {
                 <thead style={{ background: '#f8f9fa' }}>
                   <tr>
                     <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Ранг</th>
+                    <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>ID объявления</th>
                     <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Объявление</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Город</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Контакты</th>
@@ -176,10 +177,13 @@ export default function AdsIntelligencePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(topAds || []).slice(0, 15).map((ad, i) => (
+                  {(topAds || []).slice(0, 25).map((ad, i) => (
                     <tr key={ad.ad_id} style={{ borderBottom: '1px solid #f1f3f4', backgroundColor: i % 2 === 0 ? '#fff' : '#fafbfc' }}>
                       <td style={{ padding: 12, fontWeight: 700, color: i < 3 ? '#ffc107' : '#6c757d' }}>
                         #{ad.profitability_rank}
+                      </td>
+                      <td style={{ padding: 12, fontSize: 12, fontWeight: 600, color: '#2c3e50', fontFamily: 'monospace' }}>
+                        {ad.ad_id}
                       </td>
                       <td style={{ padding: 12, maxWidth: 200 }}>
                         <div style={{ fontWeight: 600, fontSize: 14, color: '#2c3e50', marginBottom: 2 }}>{ad.title}</div>
@@ -323,6 +327,7 @@ export default function AdsIntelligencePage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead style={{ background: '#f8f9fa' }}>
                   <tr>
+                    <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>ID объявления</th>
                     <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Объявление</th>
                     <th style={{ padding: 12, textAlign: 'center', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Проблема</th>
                     <th style={{ padding: 12, textAlign: 'left', borderBottom: '2px solid #e9ecef', fontSize: 13, fontWeight: 600 }}>Рекомендация</th>
@@ -333,6 +338,9 @@ export default function AdsIntelligencePage() {
                 <tbody>
                   {(recommendations || []).slice(0, 12).map((rec, i) => (
                     <tr key={`${rec.ad_id}-${rec.issue_type}`} style={{ borderBottom: '1px solid #f1f3f4', backgroundColor: i % 2 === 0 ? '#fff' : '#fafbfc' }}>
+                      <td style={{ padding: 12, fontSize: 12, fontWeight: 600, color: '#2c3e50', fontFamily: 'monospace' }}>
+                        {rec.ad_id}
+                      </td>
                       <td style={{ padding: 12, maxWidth: 180 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: '#2c3e50', marginBottom: 2 }}>{rec.title}</div>
                         <div style={{ fontSize: 11, color: '#6c757d' }}>{rec.city}</div>
