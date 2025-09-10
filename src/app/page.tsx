@@ -650,6 +650,17 @@ export default async function HomePage() {
         <div style={{ fontSize: "12px", opacity: 0.6 }}>
           © 2025 IT отдел CRM | Frontend разработчик | Все ссылки на дашборды доступны выше
         </div>
+        <div style={{ marginTop: 12 }}>
+          <a href="/health" style={{
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: 8,
+            background: '#20c997',
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: 12,
+          }}>🩺 Открыть Health Check</a>
+        </div>
       </footer>
     </main>
   );
