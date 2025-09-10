@@ -19,9 +19,35 @@ type CommitItem = {
   category?: string; // feat|fix|docs|refactor...
 };
 
+type CeoRow = {
+  active_tasks_count: number | null;
+  weekly_financial_flow: number | null;
+  new_deals_count: number | null;
+  failed_queues_count: number | null;
+  most_active_ai_agent: string | null;
+  ai_agent_events_count: number | null;
+};
+
+async function fetchCeoView(): Promise<CeoRow | undefined> {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/v_ceo_dashboard?select=*`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const res = await fetch(url, {
+    headers: { apikey, Authorization: `Bearer ${apikey}` },
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    console.error(`Fetch view v_ceo_dashboard failed: ${res.status} ${text}`);
+    return undefined;
+  }
+  const rows = (await res.json()) as CeoRow[];
+  return rows?.[0];
+}
+
 export default async function HomePage() {
   let status: DevStatus | undefined;
   let commits: CommitItem[] = [];
+  let ceo: CeoRow | undefined;
   try {
     const [statusRows, commitRows] = await Promise.all([
       rpc<DevStatus[]>("get_development_status"),
@@ -31,6 +57,11 @@ export default async function HomePage() {
     commits = commitRows ?? [];
   } catch (e) {
     console.error("Failed to load IT Hub data:", e);
+  }
+  try {
+    ceo = await fetchCeoView();
+  } catch (e) {
+    console.error("Failed to load CEO view:", e);
   }
   return (
     <main style={{ padding: "24px", maxWidth: 1200, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
@@ -488,6 +519,36 @@ export default async function HomePage() {
               </p>
             </div>
           </a>
+        </div>
+      </section>
+
+      {/* Бизнес пульс (CEO) */}
+      <section style={{ marginBottom: 32 }}>
+        <h2 style={{ fontSize: 24, color: '#20c997', marginBottom: 12 }}>🧠 Бизнес пульс</h2>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 12
+        }}>
+          <div style={{ padding: 16, background: '#e7f3ff', border: '1px solid #b8daff', borderRadius: 12 }}>
+            <div style={{ fontSize: 12, color: '#6c757d' }}>Активных задач</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#0056b3' }}>{ceo?.active_tasks_count ?? '—'}</div>
+          </div>
+          <div style={{ padding: 16, background: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: 12 }}>
+            <div style={{ fontSize: 12, color: '#6c757d' }}>Денежный поток (7д)</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#856404' }}>{ceo?.weekly_financial_flow?.toLocaleString('ru-RU') ?? '—'} ₽</div>
+          </div>
+          <div style={{ padding: 16, background: '#d4edda', border: '1px solid #c3e6cb', borderRadius: 12 }}>
+            <div style={{ fontSize: 12, color: '#6c757d' }}>Новые сделки (7д)</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#155724' }}>{ceo?.new_deals_count ?? '—'}</div>
+          </div>
+          <div style={{ padding: 16, background: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: 12 }}>
+            <div style={{ fontSize: 12, color: '#6c757d' }}>Горящих задач</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#721c24' }}>{ceo?.failed_queues_count ?? '—'}</div>
+          </div>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <a href="/ceo-dashboard" style={{ color: '#20c997', textDecoration: 'underline' }}>Открыть CEO Dashboard →</a>
         </div>
       </section>
 

@@ -1,25 +1,5 @@
 export const dynamic = 'force-dynamic';
-
-async function rpc<T>(fn: string, body?: any): Promise<T> {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/${fn}`;
-  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'apikey': apikey,
-      'Authorization': `Bearer ${apikey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'count=none',
-    },
-    body: body ? JSON.stringify(body) : '{}',
-    next: { revalidate: 0 }, // no cache
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`RPC ${fn} failed: ${res.status} ${text}`);
-  }
-  return res.json();
-}
+import { rpc } from "../../lib/rpc";
 
 type Summary = {
   total_ads: number;
@@ -67,7 +47,17 @@ export default async function AnalyticsPage() {
     console.error(e);
   }
 
-  const s = summary?.[0];
+  // Robust aliasing to match Runbook or previous schema
+  const raw: any = summary?.[0];
+  const s: Summary | undefined = raw
+    ? {
+        total_ads: raw.total_ads ?? raw.ads_count ?? null,
+        total_cities: raw.total_cities ?? raw.cities_count ?? null,
+        total_contacts: raw.total_contacts ?? raw.contacts_total ?? null,
+        avg_conversion: raw.avg_conversion ?? raw.conversion_pct ?? null,
+        refreshed_at: raw.refreshed_at ?? raw.last_updated_at ?? null,
+      }
+    : undefined;
 
   return (
     <main style={{ padding: '24px', maxWidth: 1200, margin: '0 auto', fontFamily: 'sans-serif' }}>
